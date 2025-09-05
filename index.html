@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flight Subscription</title>
+</head>
+<body>
+  <h1>Subscribe to Flight</h1>
+
+  <form id="subscriptionForm">
+    <label>
+      Airline Code:
+      <input type="text" id="airlineCode" value="LY" required>
+    </label><br><br>
+
+    <label>
+      Flight Number:
+      <input type="text" id="flightNumber" value="001" required>
+    </label><br><br>
+
+    <label>
+      Scheduled Time:
+      <input type="datetime-local" id="scheduledTime" required>
+    </label><br><br>
+
+    <label>
+      Planned Time:
+      <input type="datetime-local" id="plannedTime">
+    </label><br><br>
+
+    <button type="submit">Subscribe</button>
+  </form>
+
+  <pre id="result"></pre>
+
+  <script>
+    document.getElementById("subscriptionForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const subscription = {
+        airlineCode: document.getElementById("airlineCode").value,
+        flightNumber: document.getElementById("flightNumber").value,
+        scheduledTime: document.getElementById("scheduledTime").value,
+        plannedTime: document.getElementById("plannedTime").value
+      };
+
+      try {
+        const response = await fetch("/users/subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(subscription)
+        });
+
+        if (!response.ok) {
+          throw new Error("Request failed: " + response.status);
+        }
+
+        const data = await response.json();
+        document.getElementById("result").textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById("result").textContent = "Error: " + err.message;
+      }
+    });
+  </script>
+</body>
+</html>

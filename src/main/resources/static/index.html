@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Subscribe</title>
+</head>
+<body>
+  <h1>Subscribe to a Flight</h1>
+  <form id="subscriptionForm">
+    <input type="text" id="airline_code" placeholder="Airline Code"><br>
+    <input type="text" id="flight_number" placeholder="Flight Number"><br>
+    <input type="text" id="scheduled_time" placeholder="Scheduled Time"><br>
+    <button type="submit">Subscribe</button>
+  </form>
+
+  <script>
+    document.getElementById("subscriptionForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const data = {
+        airline_code: document.getElementById("airline_code").value,
+        flight_number: document.getElementById("flight_number").value,
+        scheduled_time: document.getElementById("scheduled_time").value,
+        last_status: "SCHEDULED",
+        last_updated: new Date().toISOString()
+      };
+
+      const searchResponse = await fetch("https://flights-springboot-241587624044.europe-west1.run.app/flights/search?airline_code=" + data.airline_code + "&flight_number=" + data.flight_number
+      + "&scheduled_time=" + data.scheduled_time, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+
+      const result = await searchResponse.json();
+      console.log(result);
+
+      const dataToSend = {
+        airline_code: result[0].airline_code,
+        flight_number: result[0].flight_number,
+        scheduled_time: result[0].scheduled_time,
+        planned_time: result[0].planned_time,
+        last_status: result[0].status_en,
+        last_updated: new Date().toISOString(),
+        airport_code: result[0].airport_code,
+        city_en: result[0].city_en,
+        city_he: result[0].city_he,
+        country_en: result[0].country_en,
+        country_he: result[0].country_he,
+        terminal: result[0].terminal,
+        counters: result[0].counters,
+        checkin_zone: result[0].checkin_zone
+      };
+
+      const response = await fetch("https://flights-springboot-241587624044.europe-west1.run.app/users/subscribe", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(dataToSend)
+      });
+
+      console.log(await response.json());
+    });
+  </script>
+</body>
+</html>
