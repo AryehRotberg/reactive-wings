@@ -24,6 +24,15 @@ public class FlightsController
         this.objectMapper = objectMapper;
     }
 
+    @GetMapping("flights")
+    public Mono<ResponseEntity<List<JsonNode>>> getFlights()
+    {
+        return flightRepository.findAll()
+            .map(flight -> objectMapper.convertValue(flight, JsonNode.class))
+            .collectList()
+            .map(results -> ResponseEntity.ok().body(results));
+    }
+
     @GetMapping("flights/search")
     public Mono<ResponseEntity<List<JsonNode>>> searchFlight(
         @RequestParam(required=false) String airline_code,

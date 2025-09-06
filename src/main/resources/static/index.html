@@ -1,71 +1,535 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Subscribe</title>
+  <title>Flight Subscription Manager</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      text-align: center;
+    }
+    
+    .header h1 {
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+    
+    .header p {
+      font-size: 1.1em;
+      opacity: 0.9;
+    }
+    
+    .content {
+      padding: 40px;
+    }
+    
+    .section {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e1e8ed;
+    }
+    
+    .section h2 {
+      color: #2c3e50;
+      margin-bottom: 20px;
+      font-size: 1.5em;
+      border-bottom: 3px solid #667eea;
+      padding-bottom: 10px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      color: #2c3e50;
+      font-weight: 600;
+      font-size: 0.9em;
+    }
+    
+    input, select, button {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e1e8ed;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      font-family: inherit;
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-danger {
+      background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
+    }
+    
+    .btn-refresh {
+      background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+      width: auto;
+      padding: 10px 20px;
+      margin-bottom: 20px;
+    }
+    
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    
+    .form-row-triple {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+    
+    @media (max-width: 768px) {
+      .form-row, .form-row-triple {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    .message {
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin: 15px 0;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .message.error {
+      background: #fee;
+      color: #c53030;
+      border-left: 4px solid #c53030;
+    }
+    
+    .message.success {
+      background: #f0fff4;
+      color: #22543d;
+      border-left: 4px solid #38a169;
+    }
+    
+    .subscription-item {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 15px 0;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .subscription-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .subscription-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .detail-label {
+      font-size: 0.8em;
+      color: #64748b;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+    
+    .detail-value {
+      color: #1e293b;
+      font-weight: 600;
+      font-size: 1em;
+    }
+    
+    .user-info {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .user-info h3 {
+      margin-bottom: 10px;
+      font-size: 1.2em;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #64748b;
+    }
+    
+    .empty-state svg {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+    
+    .flight-icon {
+      display: inline-block;
+      margin-right: 8px;
+      color: #667eea;
+    }
+    
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
 </head>
 <body>
-  <h1>Subscribe to a Flight</h1>
-  <form id="subscriptionForm">
-    <input type="text" id="airline_code" placeholder="Airline Code"><br>
-    <input type="text" id="flight_number" placeholder="Flight Number"><br>
-    <input type="text" id="scheduled_time" placeholder="Scheduled Time"><br>
-    <button type="submit">Subscribe</button>
-  </form>
+  <div class="container">
+    <div class="header">
+      <h1>✈️ Flight Subscription Manager</h1>
+      <p>Stay updated with real-time flight information</p>
+    </div>
+    
+    <div class="content">
+      <div class="section">
+        <h2>🔔 Subscribe to a Flight</h2>
+        <form id="subscriptionForm">
+          <div class="form-row-triple">
+            <div class="form-group">
+              <label for="airline_code">Airline Code</label>
+              <input type="text" id="airline_code" placeholder="e.g. EL AL" required>
+            </div>
+            <div class="form-group">
+              <label for="flight_number">Flight Number</label>
+              <input type="text" id="flight_number" placeholder="e.g. LY001" required>
+            </div>
+            <div class="form-group">
+              <label for="scheduled_date">Scheduled Date</label>
+              <input type="date" id="scheduled_date" required>
+            </div>
+          </div>
+          <button type="submit" class="btn">Subscribe to Flight</button>
+        </form>
+        <div id="subscriptionMessage"></div>
+      </div>
+
+      <div class="section">
+        <h2>📋 Your Subscriptions</h2>
+        <button id="refreshSubscriptions" class="btn btn-refresh">🔄 Refresh Subscriptions</button>
+        <div id="userInfo"></div>
+        <div id="subscriptionsList"></div>
+      </div>
+    </div>
+  </div>
 
   <script>
+    // const url = "https://flights-springboot-241587624044.europe-west1.run.app/";
+    const url = "http://localhost:8080/";
+    let currentSubscriptions = [];
+
+    // Function to display messages
+    function showMessage(elementId, message, isError = false) {
+      const element = document.getElementById(elementId);
+      if (!element) {
+        console.warn(`Element with id '${elementId}' not found. Message: ${message}`);
+        return;
+      }
+      element.innerHTML = `<div class="message ${isError ? 'error' : 'success'}">${isError ? '❌' : '✅'} ${message}</div>`;
+      setTimeout(() => {
+        if (element) {
+          element.innerHTML = '';
+        }
+      }, 5000);
+    }
+
+    // Function to format date for display
+    function formatDate(dateString) {
+      if (!dateString) return 'N/A';
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    // Function to convert scheduled_time to yyyy-mm-dd format
+    function formatScheduledTimeForAPI(scheduledTime) {
+      if (!scheduledTime) return '';
+      const date = new Date(scheduledTime);
+      // Format as yyyy-mm-dd
+      return date.getFullYear() + '-' + 
+             String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+             String(date.getDate()).padStart(2, '0');
+    }
+
+    // Function to fetch and display user subscriptions
+    async function loadUserSubscriptions() {
+      try {
+        const response = await fetch(url + "users/user-info", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch user info: ${response.status}`);
+        }
+
+        const userInfo = await response.json();
+        document.getElementById("userInfo").innerHTML = `
+          <div class="user-info">
+            <h3>👤 User Information</h3>
+            <p><strong>Email:</strong> ${userInfo.email}</p>
+          </div>
+        `;
+
+        const subscriptionsDiv = document.getElementById("subscriptionsList");
+        currentSubscriptions = userInfo.subscriptions || [];
+        
+        if (currentSubscriptions.length > 0) {
+          let subscriptionsHtml = "<h3>✈️ Active Subscriptions</h3>";
+          currentSubscriptions.forEach((sub, index) => {
+            subscriptionsHtml += `
+              <div class="subscription-item">
+                <div class="subscription-details">
+                  <div class="detail-item">
+                    <span class="detail-label">Flight</span>
+                    <span class="detail-value"><span class="flight-icon">✈️</span>${sub.airline_code} ${sub.flight_number}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Scheduled Time</span>
+                    <span class="detail-value">${formatDate(sub.scheduled_time)}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Destination</span>
+                    <span class="detail-value">${sub.city_en || 'N/A'} (${sub.country_en || 'N/A'})</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Status</span>
+                    <span class="detail-value">${sub.last_status || 'Unknown'}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Terminal</span>
+                    <span class="detail-value">${sub.terminal || 'TBD'}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Counters</span>
+                    <span class="detail-value">${sub.counters || 'TBD'}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="detail-label">Check-in Zone</span>
+                    <span class="detail-value">${sub.checkin_zone || 'TBD'}</span>
+                  </div>
+                </div>
+                <button class="btn btn-danger" onclick="deleteSubscription('${sub.airline_code}', '${sub.flight_number}', '${formatScheduledTimeForAPI(sub.scheduled_time)}')">
+                  🗑️ Remove Subscription
+                </button>
+              </div>
+            `;
+          });
+          subscriptionsDiv.innerHTML = subscriptionsHtml;
+        } else {
+          subscriptionsDiv.innerHTML = `
+            <div class="empty-state">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>
+              </svg>
+              <h3>No Active Subscriptions</h3>
+              <p>Subscribe to your first flight to get started!</p>
+            </div>
+          `;
+        }
+        
+      } catch (error) {
+        console.error("Error loading subscriptions:", error);
+        document.getElementById("subscriptionsList").innerHTML = `<div class="message error">❌ Failed to load subscriptions: ${error.message}</div>`;
+        currentSubscriptions = [];
+      }
+    }
+
+    // Function to delete a subscription
+    async function deleteSubscription(airlineCode, flightNumber, scheduledTime) {
+      try {
+        // Create URL with query parameters to match the @RequestParam in the controller
+        const params = new URLSearchParams({
+          airline_code: airlineCode,
+          flight_number: flightNumber,
+          scheduled_date: scheduledTime  // Note: parameter name is scheduled_date in the controller
+        });
+
+        const response = await fetch(url + "users/unsubscribe?" + params.toString(), {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to delete subscription: ${response.status}`);
+        }
+
+        showMessage("subscriptionsList", "Subscription deleted successfully!");
+        loadUserSubscriptions(); // Refresh the list
+      } catch (error) {
+        console.error("Error deleting subscription:", error);
+        showMessage("subscriptionsList", `Failed to delete subscription: ${error.message}`, true);
+      }
+    }
+
+    // Subscribe form handler
     document.getElementById("subscriptionForm").addEventListener("submit", async function(e) {
       e.preventDefault();
 
-      // const url = "https://flights-springboot-241587624044.europe-west1.run.app/";
-      const url = "http://localhost:8080/";
+      try {
+        const airlineCode = document.getElementById("airline_code").value;
+        const flightNumber = document.getElementById("flight_number").value;
+        const scheduledDate = document.getElementById("scheduled_date").value;
 
-      const data = {
-        airline_code: document.getElementById("airline_code").value,
-        flight_number: document.getElementById("flight_number").value,
-        scheduled_time: document.getElementById("scheduled_time").value,
-        last_status: "SCHEDULED",
-        last_updated: new Date().toISOString()
-      };
-
-      const searchResponse = await fetch(url + "flights/search?airline_code=" + data.airline_code + "&flight_number=" + data.flight_number
-      + "&scheduled_time=" + data.scheduled_time, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json"
+        // Validate input
+        if (!airlineCode || !flightNumber || !scheduledDate) {
+          showMessage("subscriptionMessage", "Please fill in all fields.", true);
+          return;
         }
-      });
 
-      const result = await searchResponse.json();
-      console.log(result);
+        // Convert date to the expected format (YYYY-MM-DD)
+        const scheduledTime = scheduledDate;
 
-      const dataToSend = {
-        airline_code: result[0].airline_code,
-        flight_number: result[0].flight_number,
-        scheduled_time: result[0].scheduled_time,
-        planned_time: result[0].planned_time,
-        last_status: result[0].status_en,
-        last_updated: new Date().toISOString(),
-        airport_code: result[0].airport_code,
-        city_en: result[0].city_en,
-        city_he: result[0].city_he,
-        country_en: result[0].country_en,
-        country_he: result[0].country_he,
-        terminal: result[0].terminal,
-        counters: result[0].counters,
-        checkin_zone: result[0].checkin_zone
-      };
+        const searchResponse = await fetch(url + "flights/search?airline_code=" + airlineCode + "&flight_number=" + flightNumber
+        + "&scheduled_time=" + scheduledTime, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
 
-      const response = await fetch(url + "users/subscribe", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(dataToSend)
-      });
+        if (!searchResponse.ok) {
+          throw new Error(`Flight search failed: ${searchResponse.status}`);
+        }
 
-      alert("Subscription successful!");
-      console.log(await response.json());
+        const result = await searchResponse.json();
+        
+        if (!result || result.length === 0) {
+          showMessage("subscriptionMessage", "No flights found with the specified criteria.", true);
+          return;
+        }
+
+        const dataToSend = {
+          airline_code: result[0].airline_code,
+          flight_number: result[0].flight_number,
+          scheduled_time: result[0].scheduled_time,
+          planned_time: result[0].planned_time,
+          last_status: result[0].status_en,
+          last_updated: new Date().toISOString(),
+          airport_code: result[0].airport_code,
+          city_en: result[0].city_en,
+          city_he: result[0].city_he,
+          country_en: result[0].country_en,
+          country_he: result[0].country_he,
+          terminal: result[0].terminal,
+          counters: result[0].counters,
+          checkin_zone: result[0].checkin_zone
+        };
+
+        const response = await fetch(url + "users/subscribe", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(dataToSend)
+        });
+
+        if (!response.ok) {
+          throw new Error(`Subscription failed: ${response.status}`);
+        }
+
+        showMessage("subscriptionMessage", "Flight subscription added successfully!");
+        document.getElementById("subscriptionForm").reset();
+        loadUserSubscriptions(); // Refresh the list
+      } catch (error) {
+        console.error("Subscription error:", error);
+        showMessage("subscriptionMessage", `Failed to subscribe: ${error.message}`, true);
+      }
     });
+
+    // Refresh button handler
+    document.getElementById("refreshSubscriptions").addEventListener("click", loadUserSubscriptions);
+
+    // Load subscriptions on page load
+    window.addEventListener("load", loadUserSubscriptions);
   </script>
 </body>
 </html>

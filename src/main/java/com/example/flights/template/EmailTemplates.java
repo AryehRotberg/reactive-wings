@@ -70,6 +70,7 @@ public class EmailTemplates
                 <style>
                 body { font-family: Arial, sans-serif; }
                 .container { max-width: 600px; margin: auto; padding: 20px; }
+                .footer { font-size: 12px; color: #777777; margin-top: 20px; border-top: 1px solid #eeeeee; padding-top: 10px; }
                 </style>
             </head>
             <body>
@@ -79,6 +80,9 @@ public class EmailTemplates
                 <p>You have successfully subscribed to flight <b>%s %s</b>.</p>
                 <p>We'll notify you when there are updates.</p>
                 <p>Best regards,<br/>Flight Notification System</p>
+                <div class="footer">
+                    <p>This is an automated message. Please do not reply.</p>
+                </div>
                 </div>
             </body>
             </html>

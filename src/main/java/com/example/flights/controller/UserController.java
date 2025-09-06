@@ -5,6 +5,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.flights.model.SubscriptionModel;
@@ -53,5 +54,25 @@ public class UserController
                         emailSenderService.sendConfirmationEmailAsync(email, subscription.getAirline_code(), subscription.getFlight_number()).subscribe();
                     });
                 });
+    }
+
+    @PostMapping("users/unsubscribe")
+    public Mono<Void> deleteUserSubscription(@AuthenticationPrincipal OAuth2User oauth2User,
+                                        @RequestParam String airline_code,
+                                        @RequestParam String flight_number,
+                                        @RequestParam String scheduled_date)
+    {
+        String email = oauth2User.getAttribute("email");
+
+        return userRepository.findById(email)
+                .flatMap(user -> {
+                    user.getSubscriptions().removeIf(sub -> 
+                        sub.getAirline_code().equals(airline_code) &&
+                        sub.getFlight_number().equals(flight_number) &&
+                        sub.getScheduled_time().contains(scheduled_date)
+                    );
+                    return userRepository.save(user);
+                })
+                .then();
     }
 }

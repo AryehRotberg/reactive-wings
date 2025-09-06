@@ -35,7 +35,7 @@ public class SubscriptionService
     @Scheduled(cron = "1/10 * * * * *")
     public void checkSubscriptions()
     {
-        System.out.println("Syncing flight statuses...");
+        System.out.println("Synchronizing flight statuses.");
 
         flightRepository.findAll()
         .collectList()

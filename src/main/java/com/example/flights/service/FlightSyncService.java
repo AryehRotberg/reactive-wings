@@ -26,7 +26,7 @@ public class FlightSyncService
     @Scheduled(cron = "0 1/1 * * * *")
     public void syncFlightsFromAPI()
     {
-        System.out.println("Synchronizing flight data from Ben Gurion API...");
+        System.out.println("Synchronizing flight data from Ben Gurion API.");
         
         bgnAPI.getBenGurionFlights()
               .map(data -> data.path("result").path("records"))
