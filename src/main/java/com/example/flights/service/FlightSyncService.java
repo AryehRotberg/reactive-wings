@@ -33,7 +33,8 @@ public class FlightSyncService
               .flatMapMany(records -> Flux.fromIterable(records)
                                           .map(record -> objectMapper.convertValue(record, FlightModel.class)))
               .collectList()
-              .flatMapMany(flightRepository::saveAll)
+              .flatMapMany(flightList -> flightRepository.deleteAll()
+                                                         .thenMany(flightRepository.saveAll(flightList)))
               .doOnError(error -> System.err.println("Error saving flights: " + error.getMessage()))
               .doOnComplete(() -> System.out.println("Flight data synchronized successfully."))
               .subscribe();
