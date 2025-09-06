@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.flights.model.SubscriptionModel;
 import com.example.flights.model.UserModel;
 import com.example.flights.repo.UserRepository;
+import com.example.flights.service.EmailSenderService;
 
 import reactor.core.publisher.Mono;
 
@@ -18,10 +19,12 @@ import reactor.core.publisher.Mono;
 public class UserController
 {
     private final UserRepository userRepository;
+    private final EmailSenderService emailSenderService;
 
-    public UserController(UserRepository userRepository)
+    public UserController(UserRepository userRepository, EmailSenderService emailSenderService)
     {
         this.userRepository = userRepository;
+        this.emailSenderService = emailSenderService;
     }
 
     @GetMapping("users/user-info")
@@ -31,7 +34,7 @@ public class UserController
 
         return userRepository.findById(email)
                 .switchIfEmpty(
-                    userRepository.save(new UserModel(email))  // save new user if not exists
+                    userRepository.save(new UserModel(email))
                 );
     }
 
@@ -44,8 +47,11 @@ public class UserController
                 .switchIfEmpty(userRepository.save(new UserModel(email)))
                 .flatMap(user -> {
                     user.getSubscriptions().add(subscription);
-                    return userRepository.save(user);
+                    return userRepository.save(user)
+                    .doOnSuccess(savedUser -> 
+                    {
+                        emailSenderService.sendConfirmationEmailAsync(email, subscription.getAirline_code(), subscription.getFlight_number()).subscribe();
+                    });
                 });
     }
-    
 }

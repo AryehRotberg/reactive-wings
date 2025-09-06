@@ -23,10 +23,15 @@ public class BenGurionAPI
                 .uri("/api/3/action/datastore_search?resource_id=e83f763b-b7d7-479e-b172-ae981ddc6de5")
                 .retrieve()
                 .bodyToMono(String.class)
-                .map(body -> {
-                    try {
+                .map(body ->
+                {
+                    try
+                    {
                         return objectMapper.readTree(body);
-                    } catch (Exception e) {
+                    }
+                    
+                    catch (Exception e)
+                    {
                         throw new RuntimeException("Failed to parse response", e);
                     }
                 });
