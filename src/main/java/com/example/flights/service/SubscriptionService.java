@@ -1,20 +1,24 @@
 package com.example.flights.service;
 
 import java.time.Instant;
-import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.example.flights.model.FlightModel;
 import com.example.flights.model.SubscriptionModel;
 import com.example.flights.model.UserModel;
-import com.example.flights.repo.FlightRepository;
 import com.example.flights.repo.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
@@ -23,76 +27,63 @@ public class SubscriptionService
 {
     private static final Logger log = LoggerFactory.getLogger(SubscriptionService.class);
 
-    private final FlightRepository flightRepository;
     private final UserRepository userRepository;
     private final EmailSenderService emailSenderService;
+    private final ReactiveMongoTemplate mongoTemplate;
 
-    public SubscriptionService(FlightRepository flightRepository, UserRepository userRepository, ObjectMapper objectMapper, EmailSenderService emailSenderService)
+    private final AtomicBoolean checkInProgress = new AtomicBoolean(false);
+
+    public SubscriptionService(UserRepository userRepository, ObjectMapper objectMapper, EmailSenderService emailSenderService, ReactiveMongoTemplate mongoTemplate)
     {
-        this.flightRepository = flightRepository;
         this.userRepository = userRepository;
         this.emailSenderService = emailSenderService;
+        this.mongoTemplate = mongoTemplate;
     }
 
-    @Scheduled(cron = "1/10 * * * * *")
+    @Scheduled(fixedDelay = 10000)
     public void checkSubscriptions()
     {
-        log.info("Synchronizing flight statuses...");
-
-        flightRepository.findAll()
-        .collectList()
-        .doOnNext(flights -> log.info("Found " + flights.size() + " flights in database"))
-        .flatMapMany(flights -> userRepository.findAll()
-            .doOnNext(user -> log.info("Checking subscriptions for user: " + user.getEmail()))
-            .flatMap(user -> processUserSubscriptions(user, flights)))
-            .subscribeOn(Schedulers.boundedElastic())
-        .subscribe(
-            result -> {},
-            error -> log.error("Error in subscription check: " + error.getMessage()),
-            () -> log.info("Subscription check completed")
-        );
-    }
-
-    private Mono<Void> processUserSubscriptions(UserModel user, List<FlightModel> flights)
-    {
-        boolean[] updated = { false };
-
-        for (SubscriptionModel sub : user.getSubscriptions())
+        if (!checkInProgress.compareAndSet(false, true))
         {
-            List<FlightModel> matchingFlights = flights.stream()
-                .filter(flight -> isFlightMatchingSubscription(flight, sub))
-                .toList();
-            
-            if (!matchingFlights.isEmpty()) {
-                // If multiple flights match, prefer the one with the latest update time
-                FlightModel flightData = matchingFlights.stream()
-                    .max((f1, f2) -> {
-                        if (f1.getLastUpdated() != null && f2.getLastUpdated() != null) {
-                            return f1.getLastUpdated().compareTo(f2.getLastUpdated());
-                        }
-                        if (f1.getLastUpdated() != null) return 1;
-                        if (f2.getLastUpdated() != null) return -1;
-                        return 0;
-                    })
-                    .orElse(matchingFlights.get(0));
-                
-                if (applyChanges(flightData, sub, user)) {
-                    updated[0] = true;
-                }
-            }
+            log.debug("Subscription check already running, skipping");
+            return;
         }
 
-        if (updated[0])
-            return userRepository.save(user).then();
-        return Mono.empty();
+        log.info("Checking subscriptions...");
+
+        userRepository.findAll()
+            .flatMap(user -> processUserSubscriptions(user).thenReturn(true))
+            .subscribeOn(Schedulers.boundedElastic())
+            .doOnError(error -> log.error("Error in subscription check: {}", error.getMessage()))
+            .doFinally(signal ->
+            {
+                checkInProgress.set(false);
+                log.info("Subscription check completed");
+            })
+            .subscribe();
+    }
+
+    private Mono<Void> processUserSubscriptions(UserModel user)
+    {
+        return Flux.fromIterable(user.getSubscriptions())
+            .concatMap(sub -> findMatchingFlight(sub)
+                .map(flight -> applyChanges(flight, sub, user))
+                .defaultIfEmpty(false)
+            )
+            .reduce(false, (acc, changed) -> acc || changed)
+            .flatMap(changed -> changed ? userRepository.save(user).then() : Mono.empty());
     }
     
-    private boolean isFlightMatchingSubscription(FlightModel flight, SubscriptionModel sub)
+    private Mono<FlightModel> findMatchingFlight(SubscriptionModel sub)
     {
-        return flight.getFlight_number() != null && flight.getFlight_number().equals(sub.getFlight_number()) &&
-               flight.getAirline_code() != null && flight.getAirline_code().equals(sub.getAirline_code()) &&
-               flight.getScheduled_time() != null && flight.getScheduled_time().equals(sub.getScheduled_time()) &&
-               flight.getAirport_code() != null && flight.getAirport_code().equals(sub.getAirport_code());
+        Query q = new Query();
+        if (sub.getAirline_code() != null) q.addCriteria(Criteria.where("airline_code").is(sub.getAirline_code()));
+        if (sub.getFlight_number() != null) q.addCriteria(Criteria.where("flight_number").is(sub.getFlight_number()));
+        if (sub.getScheduled_time() != null) q.addCriteria(Criteria.where("scheduled_time").is(sub.getScheduled_time()));
+        if (sub.getAirport_code() != null) q.addCriteria(Criteria.where("airport_code").is(sub.getAirport_code()));
+        q.with(Sort.by(Sort.Direction.DESC, "lastUpdated"));
+        q.limit(1);
+        return mongoTemplate.findOne(q, FlightModel.class);
     }
 
     private boolean applyChanges(FlightModel flightData, SubscriptionModel sub, UserModel user)
@@ -100,12 +91,11 @@ public class SubscriptionService
         boolean hasChanges = false;
         StringBuilder changeLog = new StringBuilder();
 
-        // Null-safe string comparison helper
         if (!safeEquals(flightData.getScheduled_time(), sub.getScheduled_time()))
         {
             changeLog.append("Scheduled time: ")
                     .append(sub.getScheduled_time())
-                    .append(" &rarr; ")
+                    .append(" \u2192 ")
                     .append(flightData.getScheduled_time())
                     .append("<br>");
             sub.setScheduled_time(flightData.getScheduled_time());
@@ -116,19 +106,19 @@ public class SubscriptionService
         {
             changeLog.append("Planned time: ")
                     .append(sub.getPlanned_time())
-                    .append(" &rarr; ")
+                    .append(" \u2192 ")
                     .append(flightData.getPlanned_time())
                     .append("<br>");
             sub.setPlanned_time(flightData.getPlanned_time());
             hasChanges = true;
         }
 
-        String flightTerminal = String.valueOf(flightData.getTerminal());
+        String flightTerminal = (flightData.getTerminal() < 0) ? null : String.valueOf(flightData.getTerminal());
         if (!safeEquals(flightTerminal, sub.getTerminal()))
         {
             changeLog.append("Terminal: ")
                     .append(sub.getTerminal())
-                    .append(" &rarr; ")
+                    .append(" \u2192 ")
                     .append(flightTerminal)
                     .append("<br>");
             sub.setTerminal(flightTerminal);
@@ -139,7 +129,7 @@ public class SubscriptionService
         {
             changeLog.append("Counters: ")
                     .append(sub.getCounters())
-                    .append(" &rarr; ")
+                    .append(" \u2192 ")
                     .append(flightData.getCounters())
                     .append("<br>");
             sub.setCounters(flightData.getCounters());
@@ -150,7 +140,7 @@ public class SubscriptionService
         {
             changeLog.append("Check-in zone: ")
                     .append(sub.getCheckin_zone())
-                    .append(" &rarr; ")
+                    .append(" \u2192 ")
                     .append(flightData.getCheckin_zone())
                     .append("<br>");
             sub.setCheckin_zone(flightData.getCheckin_zone());
@@ -161,7 +151,7 @@ public class SubscriptionService
         {
             changeLog.append("Status: ")
                     .append(sub.getLast_status())
-                    .append(" &rarr; ")
+                    .append(" \u2192 ")
                     .append(flightData.getStatus_en())
                     .append("<br>");
             sub.setLast_status(flightData.getStatus_en());
@@ -171,8 +161,6 @@ public class SubscriptionService
         if (hasChanges)
         {
             sub.setLast_updated(Instant.now().toString());
-            log.info("User " + user.getEmail() + " notified about flight " + sub.getFlight_number() + " changes: " + changeLog.toString());
-            
             if (emailSenderService != null)
             {
                 emailSenderService.sendEmailAsync(
@@ -180,15 +168,8 @@ public class SubscriptionService
                     sub.getAirline_code(),
                     sub.getFlight_number(), 
                     changeLog.toString()
-                ).subscribe(
-                    null,
-                    error -> log.error("Failed to send email to " + user.getEmail() + ": " + error.getMessage()),
-                    () -> log.info("Email notification sent successfully to " + user.getEmail())
-                );
+                ).subscribe(null, err -> {}, () -> {});
             }
-            
-            else
-                log.warn("Email service not available - notification logged only");
         }
         
         return hasChanges;

@@ -15,7 +15,8 @@ target/
 
 application.properties
 application.yml
-set-env.sh
+
+/scripts
 
 ### IntelliJ IDEA ###
 .idea

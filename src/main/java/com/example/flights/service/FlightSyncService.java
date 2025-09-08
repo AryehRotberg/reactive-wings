@@ -39,8 +39,10 @@ public class FlightSyncService {
     }
     
     @Scheduled(fixedDelay = 60000)
-    public void syncFlightsFromAPI() {
-        if (!syncInProgress.compareAndSet(false, true)) {
+    public void syncFlightsFromAPI()
+    {
+        if (!syncInProgress.compareAndSet(false, true))
+        {
             log.debug("Sync already in progress, skipping");
             return;
         }
@@ -63,19 +65,19 @@ public class FlightSyncService {
             .retryWhen(Retry.backoff(3, Duration.ofSeconds(2)))
             .map(data -> data.path("result").path("records"))
             .flatMapMany(records -> Flux.fromIterable(records))
-            .map(record -> {
+            .map(record ->
+            {
                 FlightModel flight = objectMapper.convertValue(record, FlightModel.class);
                 flight.setLastUpdated(syncTime);
                 return flight;
             })
             .buffer(batchSize)
-            .flatMap(batch -> flightRepository.saveAll(batch).collectList())
-            .count()
-            .flatMap(batchCount -> {
-                // Delete records that weren't updated in this sync
-                return flightRepository.deleteByLastUpdatedBefore(syncTime)
+            .flatMap(batch -> flightRepository.saveAll(batch).count())
+            .reduce(0L, Long::sum)
+            .flatMap(savedCount -> 
+                flightRepository.deleteByLastUpdatedBefore(syncTime)
                     .doOnSuccess(deleted -> log.debug("Removed {} outdated records", deleted))
-                    .thenReturn(batchCount * batchSize);
-            });
+                    .thenReturn(savedCount)
+            );
     }
 }
