@@ -1,68 +1,101 @@
 package com.example.flights.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import java.io.IOException;
+
 import org.springframework.stereotype.Service;
 
 import com.example.flights.template.EmailTemplates;
+import com.sendgrid.Method;
+import com.sendgrid.Request;
+import com.sendgrid.Response;
+import com.sendgrid.SendGrid;
+import com.sendgrid.helpers.mail.Mail;
+import com.sendgrid.helpers.mail.objects.Content;
+import com.sendgrid.helpers.mail.objects.Email;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 @Service
 public class EmailSenderService
 {
-    @Autowired(required = false)
-    private JavaMailSender mailSender;
-
-    private void sendFlightUpdateEmail(String toEmail, String airlineCode, String flightNumber, String changes)
+    private void sendFlightUpdateEmail(String toEmail, String airlineCode, String flightNumber, String changes) throws IOException
     {
         String subject = "Flight Update Alert - " + airlineCode + " " + flightNumber;
         String flightHtmlContent = EmailTemplates.flightUpdateHtml(airlineCode, flightNumber, changes.replace("\n", "<br/>"));
         sendEmail(toEmail, subject, EmailTemplates.genericHtml(subject, flightHtmlContent), true);
     }
 
-    private void sendConfirmationMail(String toEmail, String airlineCode, String flightNumber)
+    private void sendConfirmationMail(String toEmail, String airlineCode, String flightNumber) throws IOException
     {
         String subject = "Subscription Confirmed - " + airlineCode + " " + flightNumber;
         String htmlContent = EmailTemplates.subscriptionConfirmationHtml(airlineCode, flightNumber);
         sendEmail(toEmail, subject, htmlContent, true);
     }
 
-    private void sendEmail(String toEmail, String subject, String body, boolean html)
+    private void sendEmail(String toEmail, String subject, String body, boolean html) throws IOException
     {
+        Email from = new Email("flightsapispringboot@gmail.com");
+        Email to = new Email(toEmail);
+        Content content = new Content("text/html", body);
+
+        Mail mail = new Mail(from, subject, to, content);
+        System.out.println("API key: " + System.getenv("SENDGRID_API_KEY"));
+        SendGrid sg = new SendGrid(System.getenv("SENDGRID_API_KEY"));
+
+        Request request = new Request();
+        request.setMethod(Method.POST);
+        request.setEndpoint("mail/send");
+
+        request.setBody(mail.build());
+
         try
         {
-            MimeMessage mimeMessage = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, "UTF-8");
-
-            helper.setFrom("flightsapispringboot@gmail.com");
-            helper.setTo(toEmail);
-            helper.setSubject(subject);
-            helper.setText(body, html);
-            mailSender.send(mimeMessage);
+            Response response = sg.api(request);
+            System.out.println(response.getStatusCode());
+            System.out.println(response.getBody());
+            System.out.println(response.getHeaders());
         }
-
-        catch (MessagingException e)
+        
+        catch (IOException ex)
         {
-            System.err.printf("Failed to send HTML email to %s: %s%n", toEmail, e.getMessage());
+            ex.printStackTrace();
         }
     }
 
     public Mono<Void> sendEmailAsync(String toEmail, String airline_code, String flightNumber, String changes)
     {
-        return Mono.fromRunnable(() -> sendFlightUpdateEmail(toEmail, airline_code, flightNumber, changes))
-                .subscribeOn(Schedulers.boundedElastic())
-                .then();
+        return Mono.fromRunnable(() ->
+        {
+            try
+            {
+                sendFlightUpdateEmail(toEmail, airline_code, flightNumber, changes);
+            }
+            
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        })
+        .subscribeOn(Schedulers.boundedElastic())
+        .then();
     }
 
     public Mono<Void> sendConfirmationEmailAsync(String toEmail, String airline_code, String flightNumber)
     {
-        return Mono.fromRunnable(() -> sendConfirmationMail(toEmail, airline_code, flightNumber))
-                .subscribeOn(Schedulers.boundedElastic())
-                .then();
+        return Mono.fromRunnable(() ->
+        {
+            try
+            {
+                sendConfirmationMail(toEmail, airline_code, flightNumber);
+            }
+
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        })
+        .subscribeOn(Schedulers.boundedElastic())
+        .then();
     }
 }

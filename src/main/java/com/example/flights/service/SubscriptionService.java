@@ -2,8 +2,6 @@ package com.example.flights.service;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -35,50 +33,63 @@ public class SubscriptionService
     @Scheduled(cron = "1/10 * * * * *")
     public void checkSubscriptions()
     {
-        System.out.println("Synchronizing flight statuses.");
+        System.out.println("Synchronizing flight statuses...");
 
         flightRepository.findAll()
         .collectList()
+        .doOnNext(flights -> System.out.println("Found " + flights.size() + " flights in database"))
         .flatMapMany(flights -> userRepository.findAll()
+            .doOnNext(user -> System.out.println("Checking subscriptions for user: " + user.getEmail()))
             .flatMap(user -> processUserSubscriptions(user, flights)))
             .subscribeOn(Schedulers.boundedElastic())
-        .subscribe();
+        .subscribe(
+            result -> {},
+            error -> System.err.println("Error in subscription check: " + error.getMessage()),
+            () -> System.out.println("Subscription check completed")
+        );
     }
 
     private Mono<Void> processUserSubscriptions(UserModel user, List<FlightModel> flights)
     {
-        Map<String, FlightModel> flightMap = flights.stream()
-            .collect(Collectors.toMap(this::buildKey, f -> f));
-
         boolean[] updated = { false };
 
         for (SubscriptionModel sub : user.getSubscriptions())
-        {                    
-            FlightModel flightData = flightMap.get(buildKey(sub));
-
-            if (flightData != null && applyChanges(flightData, sub, user))
-                updated[0] = true;
+        {
+            // Find matching flights for this subscription (there might be multiple due to direction differences)
+            List<FlightModel> matchingFlights = flights.stream()
+                .filter(flight -> isFlightMatchingSubscription(flight, sub))
+                .toList();
+            
+            if (!matchingFlights.isEmpty()) {
+                // If multiple flights match, prefer the one with the latest update time
+                FlightModel flightData = matchingFlights.stream()
+                    .max((f1, f2) -> {
+                        if (f1.getLastUpdated() != null && f2.getLastUpdated() != null) {
+                            return f1.getLastUpdated().compareTo(f2.getLastUpdated());
+                        }
+                        if (f1.getLastUpdated() != null) return 1;
+                        if (f2.getLastUpdated() != null) return -1;
+                        return 0;
+                    })
+                    .orElse(matchingFlights.get(0));
+                
+                if (applyChanges(flightData, sub, user)) {
+                    updated[0] = true;
+                }
+            }
         }
 
         if (updated[0])
             return userRepository.save(user).then();
         return Mono.empty();
     }
-
-    private String buildKey(FlightModel flightModel)
+    
+    private boolean isFlightMatchingSubscription(FlightModel flight, SubscriptionModel sub)
     {
-        return flightModel.getFlight_number() + "-" +
-                flightModel.getAirline_code() + "-" +
-                flightModel.getScheduled_time() + "-" +
-                flightModel.getAirport_code();
-    }
-
-    private String buildKey(SubscriptionModel sub)
-    {
-        return sub.getFlight_number() + "-" +
-                sub.getAirline_code() + "-" +
-                sub.getScheduled_time() + "-" +
-                sub.getAirport_code();
+        return flight.getFlight_number() != null && flight.getFlight_number().equals(sub.getFlight_number()) &&
+               flight.getAirline_code() != null && flight.getAirline_code().equals(sub.getAirline_code()) &&
+               flight.getScheduled_time() != null && flight.getScheduled_time().equals(sub.getScheduled_time()) &&
+               flight.getAirport_code() != null && flight.getAirport_code().equals(sub.getAirport_code());
     }
 
     private boolean applyChanges(FlightModel flightData, SubscriptionModel sub, UserModel user)
@@ -86,7 +97,8 @@ public class SubscriptionService
         boolean hasChanges = false;
         StringBuilder changeLog = new StringBuilder();
 
-        if (!flightData.getScheduled_time().equals(sub.getScheduled_time()))
+        // Null-safe string comparison helper
+        if (!safeEquals(flightData.getScheduled_time(), sub.getScheduled_time()))
         {
             changeLog.append("Scheduled time: ")
                     .append(sub.getScheduled_time())
@@ -97,7 +109,7 @@ public class SubscriptionService
             hasChanges = true;
         }
 
-        if (!flightData.getPlanned_time().equals(sub.getPlanned_time()))
+        if (!safeEquals(flightData.getPlanned_time(), sub.getPlanned_time()))
         {
             changeLog.append("Planned time: ")
                     .append(sub.getPlanned_time())
@@ -108,18 +120,19 @@ public class SubscriptionService
             hasChanges = true;
         }
 
-        if (!String.valueOf(flightData.getTerminal()).equals(sub.getTerminal()))
+        String flightTerminal = String.valueOf(flightData.getTerminal());
+        if (!safeEquals(flightTerminal, sub.getTerminal()))
         {
             changeLog.append("Terminal: ")
                     .append(sub.getTerminal())
                     .append(" &rarr; ")
-                    .append(flightData.getTerminal())
+                    .append(flightTerminal)
                     .append("<br>");
-            sub.setTerminal(String.valueOf(flightData.getTerminal()));
+            sub.setTerminal(flightTerminal);
             hasChanges = true;
         }
 
-        if (!flightData.getCounters().equals(sub.getCounters()))
+        if (!safeEquals(flightData.getCounters(), sub.getCounters()))
         {
             changeLog.append("Counters: ")
                     .append(sub.getCounters())
@@ -130,7 +143,7 @@ public class SubscriptionService
             hasChanges = true;
         }
 
-        if (!flightData.getCheckin_zone().equals(sub.getCheckin_zone()))
+        if (!safeEquals(flightData.getCheckin_zone(), sub.getCheckin_zone()))
         {
             changeLog.append("Check-in zone: ")
                     .append(sub.getCheckin_zone())
@@ -141,7 +154,7 @@ public class SubscriptionService
             hasChanges = true;
         }
 
-        if (!flightData.getStatus_en().equals(sub.getLast_status()))
+        if (!safeEquals(flightData.getStatus_en(), sub.getLast_status()))
         {
             changeLog.append("Status: ")
                     .append(sub.getLast_status())
@@ -176,5 +189,12 @@ public class SubscriptionService
         }
         
         return hasChanges;
+    }
+    
+    private boolean safeEquals(String str1, String str2)
+    {
+        if (str1 == null && str2 == null) return true;
+        if (str1 == null || str2 == null) return false;
+        return str1.equals(str2);
     }
 }

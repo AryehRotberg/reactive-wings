@@ -1,206 +1,532 @@
-# Flights Notification System
+# ✈️ Flight Subscription Manager
 
-A Spring Boot application that monitors Ben Gurion Airport flight data and sends email notifications to users when their subscribed flights have status updates.
+A comprehensive real-time flight monitoring and notification system built with Spring Boot WebFlux. The application tracks Ben Gurion Airport flight data and provides automated email notifications to users when their subscribed flights experience status changes.
 
-## Features
+## 🚀 Features
 
-- **Real-time Flight Monitoring**: Automatically syncs flight data from Ben Gurion Airport's public API
-- **Flight Subscription**: Users can subscribe to specific flights for status updates
-- **Email Notifications**: Automatic email alerts when flight details change (time, terminal, status, etc.)
-- **Google OAuth Integration**: Secure user authentication via Google
-- **REST API**: Comprehensive API for flight search and user management
-- **Reactive Architecture**: Built with Spring WebFlux for high-performance, non-blocking operations
-- **Docker Support**: Containerized application for easy deployment
+- **🔄 Real-time Flight Monitoring**: Automatically syncs flight data from Ben Gurion Airport's API every 60 seconds
+- **📱 Flight Subscription Management**: Users can subscribe to specific flights for personalized updates
+- **📧 Smart Email Notifications**: Automated HTML email alerts via SendGrid when flight details change
+- **🔐 Google OAuth Integration**: Secure user authentication with Google OAuth 2.0
+- **🌐 Modern Web Interface**: Responsive single-page application with real-time updates
+- **⚡ Reactive Architecture**: Built with Spring WebFlux for high-performance, non-blocking operations
+- **🐳 Cloud-Ready Deployment**: Containerized application deployed on Google Kubernetes Engine
+- **📊 Comprehensive Monitoring**: Tracks schedule changes, terminal updates, counter assignments, and flight status
 
-## Technology Stack
+## 🛠️ Technology Stack
 
 - **Backend**: Spring Boot 3.5.5 with WebFlux (Reactive)
-- **Database**: MongoDB (Reactive)
+- **Database**: MongoDB Atlas (Cloud-hosted, Reactive)
 - **Authentication**: OAuth2 (Google)
-- **Email Service**: Spring Mail with Gmail SMTP
+- **Email Service**: SendGrid API
+- **Frontend**: Vanilla JavaScript with modern CSS
 - **Build Tool**: Maven
-- **Container**: Docker
+- **Container**: Docker with Java 21
+- **Deployment**: Google Kubernetes Engine (GKE)
 - **Java Version**: 21
 
-## API Endpoints
+## 🎯 System Architecture
+
+```mermaid
+graph TB
+    %% External Systems
+    User[👤 User Browser]
+    BenGurion[🛫 Ben Gurion Airport API<br/>data.gov.il]
+    SendGrid[📧 SendGrid Email Service]
+    
+    %% Google Cloud Infrastructure
+    subgraph "Google Kubernetes Engine GKE"
+        subgraph "Load Balancer"
+            LB[🔗 Google Load Balancer<br/>34.63.104.140.nip.io:8080]
+        end
+        
+        subgraph "Kubernetes Cluster"
+            subgraph "Application Pods"
+                App1[📦 Flight Manager Pod 1<br/>Spring Boot WebFlux]
+                App2[📦 Flight Manager Pod 2<br/>Spring Boot WebFlux]
+                App3[📦 Flight Manager Pod N<br/>Spring Boot WebFlux]
+            end
+        end
+    end
+    
+    %% External Database
+    MongoDB[(🍃 MongoDB Atlas<br/>Cloud Database)]
+    
+    %% Google OAuth
+    GoogleOAuth[🔑 Google OAuth 2.0<br/>Authentication Provider]
+    
+    %% Connections
+    User --> LB
+    LB --> App1
+    LB --> App2 
+    LB --> App3
+    
+    App1 --> BenGurion
+    App1 --> SendGrid
+    App1 --> MongoDB
+    App1 --> GoogleOAuth
+    
+    %% Styling
+    classDef external fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef gcp fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef data fill:#fff8e1,stroke:#e65100,stroke-width:2px
+    
+    class User,BenGurion,SendGrid,GoogleOAuth external
+    class LB,App1,App2,App3 gcp
+    class MongoDB data
+```
+
+## 🔌 API Endpoints
 
 ### Flight Operations
-- `GET /flights/sync` - Manually trigger flight data synchronization
-- `GET /flights/search` - Search flights with optional filters:
-  - `airline_code` - Filter by airline code
-  - `flight_number` - Filter by flight number
+- `GET /flights` - Retrieve all current flights
+- `GET /flights/search` - Search flights with filters:
+  - `airline_code` - Filter by airline code (e.g., "EL AL")
+  - `flight_number` - Filter by flight number (e.g., "LY001")
   - `scheduled_date` - Filter by scheduled date
   - `scheduled_time` - Filter by scheduled time
   - `planned_date` - Filter by planned date
   - `planned_time` - Filter by planned time
 
-### User Operations
+### User Operations (Authentication Required)
+- `GET /users/user-info` - Get current user profile and subscriptions
 - `POST /users/subscribe` - Subscribe to flight notifications
-- User authentication via Google OAuth2
+- `POST /users/unsubscribe` - Remove flight subscription
 
-## Automated Monitoring
+### Security
+- All user endpoints require Google OAuth 2.0 authentication
+- Public endpoints: `/health`, `/actuator/**`
 
-- **Flight Data Sync**: Every 15 minutes (`0 0/15 * * * *`)
-- **Status Monitoring**: Every 10 seconds for subscribed flights
-- **Automatic Notifications**: Emails sent when flight details change
+## ⚙️ Automated Monitoring
 
-## Quick Start
+The system includes several automated background processes:
+
+- **🔄 Flight Data Synchronization**: Every 60 seconds
+  - Fetches latest flight data from Ben Gurion Airport API
+  - Updates MongoDB with current flight information
+  - Removes outdated flight records
+  
+- **📊 Subscription Monitoring**: Every 10 seconds
+  - Checks all user subscriptions against current flight data
+  - Detects changes in: schedule, terminal, counters, check-in zones, status
+  - Triggers email notifications for detected changes
+
+- **📧 Email Notifications**: Real-time
+  - HTML email templates with flight update details
+  - Subscription confirmation emails
+  - Asynchronous processing to avoid blocking
+
+## 🚀 Deployment
+
+### Live Application
+- **Production URL**: `http://34.63.104.140.nip.io:8080/`
+- **Platform**: Google Kubernetes Engine (GKE)
+- **Container Registry**: `aryehrotberg709/flights-manager:1.0.11`
+
+### Architecture Components
+- **Load Balancer**: Google Cloud Load Balancer
+- **Container Orchestration**: Kubernetes with horizontal pod autoscaling
+- **Database**: MongoDB Atlas (Cloud-hosted)
+- **Email Service**: SendGrid API
+- **Authentication**: Google OAuth 2.0
+
+## 🏃‍♂️ Quick Start
 
 ### Prerequisites
-- Java 21
+- Java 21+
 - Maven 3.6+
-- Docker (optional)
-- MongoDB instance
+- Docker (for containerization)
+- Google Cloud Account (for OAuth setup)
+- SendGrid Account (for email notifications)
 
-### Running Locally
+### Local Development Setup
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/AryehRotberg/flights.git
    cd flights
    ```
 
 2. **Configure application properties**
    
-   Update `src/main/resources/application.properties` with your configuration:
+   Update `src/main/resources/application.properties`:
    ```properties
    # MongoDB Configuration
-   spring.data.mongodb.uri=your_mongodb_connection_string
+   spring.data.mongodb.uri=mongodb+srv://username:password@cluster.mongodb.net/flights
    spring.data.mongodb.database=flights
    
    # Google OAuth2 Configuration
-   spring.security.oauth2.client.registration.google.client-id=your_google_client_id
-   spring.security.oauth2.client.registration.google.client-secret=your_google_client_secret
-   spring.security.oauth2.client.registration.google.redirect-uri=your_redirect_uri
+   spring.security.oauth2.client.registration.google.client-id=your-client-id
+   spring.security.oauth2.client.registration.google.client-secret=your-client-secret
    
-   # Email Configuration
-   spring.mail.username=your_email@gmail.com
-   spring.mail.password=your_app_password
+   # Email Configuration (Gmail SMTP - fallback)
+   spring.mail.host=smtp.gmail.com
+   spring.mail.port=587
+   spring.mail.username=your-email@gmail.com
+   spring.mail.password=your-app-password
    ```
 
-3. **Run the application**
+3. **Set up environment variables**
+   ```bash
+   export SENDGRID_API_KEY=your-sendgrid-api-key
+   ```
+
+4. **Run the application**
    ```bash
    ./mvnw spring-boot:run
    ```
 
-4. **Access the application**
-   - API: `http://localhost:8080`
+5. **Access the application**
    - Web Interface: `http://localhost:8080`
+   - API Base: `http://localhost:8080/flights`
 
-### Using Docker
+### Docker Deployment
 
-1. **Build and run with Docker Compose**
+1. **Build the application**
    ```bash
-   docker-compose up --build
+   ./mvnw clean package
    ```
 
-2. **Access the application**
-   - API: `http://localhost:8080`
+2. **Build Docker image**
+   ```bash
+   docker build -t flights-manager:latest .
+   ```
 
-## Configuration
+3. **Run with Docker Compose**
+   ```bash
+   docker-compose up
+   ```
 
-### Environment Variables
+### Kubernetes Deployment
 
-The following environment variables can be configured:
+1. **Build and push image**
+   ```bash
+   docker build -t your-registry/flights-manager:latest .
+   docker push your-registry/flights-manager:latest
+   ```
 
-- `MONGODB_URI` - MongoDB connection string
-- `GOOGLE_CLIENT_ID` - Google OAuth2 client ID
-- `GOOGLE_CLIENT_SECRET` - Google OAuth2 client secret
-- `EMAIL_USERNAME` - Gmail username for notifications
-- `EMAIL_PASSWORD` - Gmail app password
+2. **Deploy to GKE**
+   ```bash
+   kubectl apply -f k8s/
+   ```
 
-### OAuth2 Setup
+## ⚙️ Configuration
 
-1. Create a Google Cloud Project
-2. Enable Google+ API
-3. Create OAuth2 credentials
-4. Add authorized redirect URIs
-5. Update application.properties with client credentials
+### Required Environment Variables
 
-### Email Setup
-
-1. Enable 2-factor authentication on Gmail
-2. Generate an app-specific password
-3. Use the app password in application.properties
-
-## Data Models
-
-### Flight Model
-- Flight number, airline code
-- Scheduled and planned times
-- Terminal, counters, check-in zone
-- Status and airport information
-- City and country details
-
-### User Model
-- Email (from Google OAuth)
-- List of flight subscriptions
-- Creation timestamp
-
-### Subscription Model
-- Flight details
-- Last known status
-- Last update timestamp
-
-## API Documentation
-
-Once the application is running, API documentation is available at:
-- Swagger UI: `http://localhost:8080/swagger-ui.html`
-
-## Monitoring and Logging
-
-The application includes:
-- Console logging for sync operations
-- Email notification status logging
-- Error handling for API failures
-- Scheduled task monitoring
-
-## Deployment
-
-The application is containerized and can be deployed to:
-- Google Cloud Run
-- AWS ECS
-- Kubernetes
-- Any Docker-compatible platform
-
-### Docker Image
-
-The application is built as a Docker image and can be pushed to registries:
 ```bash
-docker build -t flights-springboot:latest .
-docker tag flights-springboot:latest your-registry/flights-springboot:latest
-docker push your-registry/flights-springboot:latest
+# SendGrid Email Service
+SENDGRID_API_KEY=your-sendgrid-api-key
+
+# Optional: Override MongoDB URI
+MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/flights
+
+# Optional: Override OAuth credentials
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
 ```
 
-## Contributing
+### Google OAuth2 Setup
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+1. **Create Google Cloud Project**
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project or select existing one
 
-## License
+2. **Enable APIs**
+   - Enable Google+ API or Google Identity API
+   - Enable Google OAuth2 API
 
-This project is open source and available under the [MIT License](LICENSE).
+3. **Create OAuth2 Credentials**
+   - Go to "Credentials" → "Create Credentials" → "OAuth 2.0 Client ID"
+   - Application type: Web application
+   - Authorized redirect URIs:
+     - `http://localhost:8080/login/oauth2/code/google` (local)
+     - `http://34.63.104.140.nip.io:8080/login/oauth2/code/google` (production)
 
-## Support
+4. **Update Configuration**
+   - Copy Client ID and Client Secret to `application.properties`
 
-For issues and questions:
-- Create an issue in the repository
-- Check the application logs for error details
-- Verify configuration settings
+### SendGrid Email Setup
 
-## Data Source
+1. **Create SendGrid Account**
+   - Sign up at [SendGrid](https://sendgrid.com/)
+   - Verify your sender identity
 
-Flight data is sourced from the Israeli Government's open data portal:
-- **API**: `https://data.gov.il/api/3/action/datastore_search`
+2. **Generate API Key**
+   - Go to Settings → API Keys
+   - Create API key with "Full Access" permissions
+   - Set as environment variable: `SENDGRID_API_KEY`
+
+3. **Configure Sender Email**
+   - Update `EmailSenderService.java` with your verified sender email
+
+## 📊 Data Models
+
+### FlightModel
+```java
+{
+  "id": "unique_flight_id",
+  "airline_code": "EL AL",
+  "flight_number": "LY001", 
+  "airline_name": "El Al Israel Airlines",
+  "scheduled_time": "2025-09-07T10:30:00",
+  "planned_time": "2025-09-07T10:35:00",
+  "direction": "Departure/Arrival",
+  "airport_code": "JFK",
+  "city_en": "New York",
+  "city_he": "ניו יורק",
+  "country_en": "United States",
+  "country_he": "ארצות הברית",
+  "terminal": 3,
+  "counters": "301-320",
+  "checkin_zone": "A",
+  "status_en": "On Time",
+  "status_he": "בזמן",
+  "lastUpdated": "2025-09-07T15:30:00"
+}
+```
+
+### UserModel
+```java
+{
+  "id": "user_email@gmail.com",
+  "email": "user_email@gmail.com",
+  "subscriptions": [
+    {
+      "airline_code": "EL AL",
+      "flight_number": "LY001",
+      "scheduled_time": "2025-09-07T10:30:00",
+      "planned_time": "2025-09-07T10:35:00",
+      "last_status": "On Time",
+      "last_updated": "2025-09-07T15:30:00",
+      "airport_code": "JFK",
+      "city_en": "New York",
+      "country_en": "United States",
+      "terminal": "3",
+      "counters": "301-320",
+      "checkin_zone": "A"
+    }
+  ]
+}
+```
+
+## 📚 API Documentation
+
+### Flight Search Examples
+
+```bash
+# Get all flights
+curl http://34.63.104.140.nip.io:8080/flights
+
+# Search by airline
+curl "http://34.63.104.140.nip.io:8080/flights/search?airline_code=EL AL"
+
+# Search by flight number
+curl "http://34.63.104.140.nip.io:8080/flights/search?flight_number=LY001"
+
+# Search by date
+curl "http://34.63.104.140.nip.io:8080/flights/search?scheduled_date=2025-09-07"
+```
+
+### User Operations (Requires Authentication)
+
+```bash
+# Get user info and subscriptions
+curl -H "Authorization: Bearer $TOKEN" \
+     http://34.63.104.140.nip.io:8080/users/user-info
+
+# Subscribe to a flight
+curl -X POST \
+     -H "Authorization: Bearer $TOKEN" \
+     -H "Content-Type: application/json" \
+     -d '{"airline_code":"EL AL","flight_number":"LY001","scheduled_time":"2025-09-07T10:30:00"}' \
+     http://34.63.104.140.nip.io:8080/users/subscribe
+
+# Unsubscribe from a flight
+curl -X POST \
+     -H "Authorization: Bearer $TOKEN" \
+     "http://34.63.104.140.nip.io:8080/users/unsubscribe?airline_code=EL AL&flight_number=LY001&scheduled_date=2025-09-07"
+```
+
+## 📈 Monitoring and Logging
+
+### Application Monitoring
+- **Flight Sync Logs**: Console output every 60 seconds showing sync status
+- **Subscription Monitoring**: Real-time logging of user notifications
+- **Email Status**: Success/failure logging for email notifications
+- **Error Handling**: Comprehensive error logging for API failures
+
+### Health Checks
+- **Endpoint**: `GET /health` (public access)
+- **Actuator**: `GET /actuator/**` endpoints for monitoring
+- **Database**: Reactive MongoDB connection monitoring
+- **External APIs**: Ben Gurion API availability tracking
+
+### Performance Metrics
+- **Reactive Processing**: Non-blocking I/O for high throughput
+- **Batch Processing**: Flight data processed in configurable batches (default: 50)
+- **Async Notifications**: Email processing doesn't block main application flow
+- **Connection Pooling**: Optimized database connections
+
+## 🚀 Production Deployment
+
+### Current Production Environment
+- **URL**: http://34.63.104.140.nip.io:8080/
+- **Platform**: Google Kubernetes Engine (GKE)
+- **Region**: europe-west1
+- **Container**: `aryehrotberg709/flights-manager:1.0.11`
+
+### Deployment Process
+```bash
+# Build application
+./mvnw clean package
+
+# Build Docker image
+docker build -t aryehrotberg709/flights-manager:1.0.11 .
+
+# Push to registry
+docker push aryehrotberg709/flights-manager:1.0.11
+
+# Deploy to GKE (using kubectl or GCP Console)
+kubectl set image deployment/flights-app flights-app=aryehrotberg709/flights-manager:1.0.11
+```
+
+### Scaling Configuration
+- **Horizontal Pod Autoscaler**: Automatically scales based on CPU/memory usage
+- **Resource Limits**: Configured per pod for optimal resource utilization
+- **Load Balancer**: Google Cloud Load Balancer distributes traffic across pods
+
+## 🔧 Development
+
+### Project Structure
+```
+src/
+├── main/
+│   ├── java/com/example/flights/
+│   │   ├── FlightsApplication.java          # Main application class
+│   │   ├── config/SecurityConfig.java       # OAuth2 security configuration
+│   │   ├── controller/                      # REST controllers
+│   │   │   ├── FlightsController.java       # Flight operations
+│   │   │   └── UserController.java          # User management
+│   │   ├── model/                          # Data models
+│   │   │   ├── FlightModel.java            # Flight entity
+│   │   │   ├── UserModel.java              # User entity
+│   │   │   └── SubscriptionModel.java      # Subscription entity
+│   │   ├── repo/                           # Repository interfaces
+│   │   │   ├── FlightRepository.java       # Flight data access
+│   │   │   └── UserRepository.java         # User data access
+│   │   ├── service/                        # Business logic
+│   │   │   ├── BenGurionAPI.java          # External API client
+│   │   │   ├── FlightSyncService.java     # Data synchronization
+│   │   │   ├── SubscriptionService.java   # Subscription monitoring
+│   │   │   └── EmailSenderService.java    # Email notifications
+│   │   └── template/EmailTemplates.java    # Email HTML templates
+│   └── resources/
+│       ├── application.properties          # Configuration
+│       └── static/index.html              # Frontend application
+└── test/                                   # Unit tests
+```
+
+### Key Development Commands
+```bash
+# Run tests
+./mvnw test
+
+# Run application with dev profile
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+
+# Build without tests
+./mvnw clean package -DskipTests
+
+# Run with Docker Compose
+docker-compose up --build
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Please follow these steps:
+
+1. **Fork the repository**
+2. **Create a feature branch**
+   ```bash
+   git checkout -b feature/amazing-feature
+   ```
+3. **Make your changes**
+4. **Add tests** (if applicable)
+5. **Commit your changes**
+   ```bash
+   git commit -m 'Add amazing feature'
+   ```
+6. **Push to the branch**
+   ```bash
+   git push origin feature/amazing-feature
+   ```
+7. **Open a Pull Request**
+
+### Development Guidelines
+- Follow Spring Boot best practices
+- Use reactive programming patterns (Mono/Flux)
+- Add appropriate logging
+- Include unit tests for new features
+- Update documentation for API changes
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support & Troubleshooting
+
+### Common Issues
+
+**Authentication Problems**
+- Verify Google OAuth2 credentials are correct
+- Check redirect URIs match your deployment URL
+- Ensure Google APIs are enabled in your project
+
+**Email Notifications Not Working**
+- Verify `SENDGRID_API_KEY` environment variable is set
+- Check SendGrid account is verified and has sending permissions
+- Review application logs for email service errors
+
+**Flight Data Not Updating**
+- Check Ben Gurion Airport API availability
+- Review sync service logs for errors
+- Verify MongoDB connection and permissions
+
+**Database Connection Issues**
+- Ensure MongoDB Atlas cluster is running
+- Check firewall settings allow connections
+- Verify connection string format and credentials
+
+### Getting Help
+- 🐛 **Bug Reports**: Create an issue with detailed reproduction steps
+- 💡 **Feature Requests**: Open an issue with your proposed enhancement
+- 📚 **Documentation**: Check application logs and API responses
+- 🔧 **Configuration**: Review `application.properties` settings
+
+### Contact
+- **Repository**: [GitHub - AryehRotberg/flights](https://github.com/AryehRotberg/flights)
+- **Issues**: [GitHub Issues](https://github.com/AryehRotberg/flights/issues)
+
+## 📊 Data Source
+
+**Ben Gurion International Airport Flight Data**
+- **Provider**: Israeli Government Open Data Portal
+- **API Endpoint**: `https://data.gov.il/api/3/action/datastore_search`
 - **Resource ID**: `e83f763b-b7d7-479e-b172-ae981ddc6de5`
-- **Airport**: Ben Gurion International Airport
+- **Update Frequency**: Real-time (application syncs every 60 seconds)
+- **Data Format**: JSON with Hebrew and English fields
+- **Coverage**: All departures and arrivals at Ben Gurion Airport
 
-## Security Notes
+## 🔒 Security & Privacy
 
-- OAuth2 integration for secure authentication
-- No sensitive data stored in flight records
-- Email credentials should use app-specific passwords
-- Database connection should use encrypted connections
+- **Authentication**: OAuth2 with Google - no passwords stored
+- **Data Privacy**: Only email addresses and flight preferences stored
+- **API Security**: HTTPS in production, rate limiting on external APIs
+- **Database Security**: MongoDB Atlas with encryption at rest and in transit
+- **Email Security**: SendGrid API with verified sender domains
+- **No Sensitive Data**: Flight information is public data from government APIs
+
+---
+
+**Built with ❤️ using Spring Boot WebFlux and deployed on Google Cloud Platform**

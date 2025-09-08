@@ -1,5 +1,7 @@
 package com.example.flights.model;
 
+import java.time.LocalDateTime;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -65,6 +67,8 @@ public class FlightModel
     @JsonAlias("CHRMINH")
     private String status_he;
 
+    private LocalDateTime lastUpdated;
+
     // Constructors
     public FlightModel() {}
 
@@ -125,4 +129,7 @@ public class FlightModel
 
     public String getStatus_he() { return status_he; }
     public void setStatus_he(String status_he) { this.status_he = status_he; }
+
+    public LocalDateTime getLastUpdated() { return lastUpdated; }
+    public void setLastUpdated(LocalDateTime lastUpdated) { this.lastUpdated = lastUpdated; }
 }
