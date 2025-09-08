@@ -51,7 +51,10 @@ public class UserController
                     return userRepository.save(user)
                     .doOnSuccess(savedUser -> 
                     {
-                        emailSenderService.sendConfirmationEmailAsync(email, subscription.getAirline_code(), subscription.getFlight_number()).subscribe();
+                        emailSenderService.sendConfirmationEmailAsync(email,
+                                                                        subscription.getAirline_code(),
+                                                                        subscription.getFlight_number(),
+                                                                        subscription.getCity_en()).subscribe();
                     });
                 });
     }

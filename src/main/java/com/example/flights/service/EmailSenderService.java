@@ -26,10 +26,10 @@ public class EmailSenderService
         sendEmail(toEmail, subject, EmailTemplates.genericHtml(subject, flightHtmlContent), true);
     }
 
-    private void sendConfirmationMail(String toEmail, String airlineCode, String flightNumber) throws IOException
+    private void sendConfirmationMail(String toEmail, String airlineCode, String flightNumber, String city_en) throws IOException
     {
-        String subject = "Subscription Confirmed - " + airlineCode + " " + flightNumber;
-        String htmlContent = EmailTemplates.subscriptionConfirmationHtml(airlineCode, flightNumber);
+        String subject = "Subscription Confirmed - " + airlineCode + " " + flightNumber + " to " + city_en + " ✈️";
+        String htmlContent = EmailTemplates.subscriptionConfirmationHtml(airlineCode, flightNumber, city_en);
         sendEmail(toEmail, subject, htmlContent, true);
     }
 
@@ -40,7 +40,6 @@ public class EmailSenderService
         Content content = new Content("text/html", body);
 
         Mail mail = new Mail(from, subject, to, content);
-        System.out.println("API key: " + System.getenv("SENDGRID_API_KEY"));
         SendGrid sg = new SendGrid(System.getenv("SENDGRID_API_KEY"));
 
         Request request = new Request();
@@ -81,13 +80,13 @@ public class EmailSenderService
         .then();
     }
 
-    public Mono<Void> sendConfirmationEmailAsync(String toEmail, String airline_code, String flightNumber)
+    public Mono<Void> sendConfirmationEmailAsync(String toEmail, String airline_code, String flightNumber, String city_en)
     {
         return Mono.fromRunnable(() ->
         {
             try
             {
-                sendConfirmationMail(toEmail, airline_code, flightNumber);
+                sendConfirmationMail(toEmail, airline_code, flightNumber, city_en);
             }
 
             catch (IOException e)

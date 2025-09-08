@@ -1,57 +1,77 @@
 package com.example.flights.controller;
 
-import java.util.List;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.flights.repo.FlightRepository;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import reactor.core.publisher.Mono;
+import com.example.flights.model.FlightModel;
+import reactor.core.publisher.Flux;
 
 @RestController
 public class FlightsController
 {
-    private final FlightRepository flightRepository;
-    private final ObjectMapper objectMapper;
+    private final ReactiveMongoTemplate mongoTemplate;
 
-    public FlightsController(FlightRepository flightRepository, ObjectMapper objectMapper)
+    public FlightsController(ReactiveMongoTemplate mongoTemplate)
     {
-        this.flightRepository = flightRepository;
-        this.objectMapper = objectMapper;
+        this.mongoTemplate = mongoTemplate;
     }
 
     @GetMapping("flights")
-    public Mono<ResponseEntity<List<JsonNode>>> getFlights()
+    public Flux<FlightModel> getFlights(@RequestParam(defaultValue = "0") int page,
+                                        @RequestParam(defaultValue = "100") int size)
     {
-        return flightRepository.findAll()
-            .map(flight -> objectMapper.convertValue(flight, JsonNode.class))
-            .collectList()
-            .map(results -> ResponseEntity.ok().body(results));
+        int limit = Math.min(size, 500);
+        int skip = Math.max(page, 0) * limit;
+
+        Query query = new Query()
+            .skip(skip)
+            .limit(limit)
+            .with(Sort.by(Sort.Direction.DESC, "lastUpdated"));
+
+        return mongoTemplate.find(query, FlightModel.class);
     }
 
     @GetMapping("flights/search")
-    public Mono<ResponseEntity<List<JsonNode>>> searchFlight(
-        @RequestParam(required=false) String airline_code,
-        @RequestParam(required=false) String flight_number,
-        @RequestParam(required=false) String scheduled_date,
-        @RequestParam(required=false) String scheduled_time,
-        @RequestParam(required=false) String planned_date,
-        @RequestParam(required=false) String planned_time
+    public Flux<FlightModel> searchFlight(
+        @RequestParam(required = false) String airline_code,
+        @RequestParam(required = false) String flight_number,
+        @RequestParam(required = false) String scheduled_date,
+        @RequestParam(required = false) String scheduled_time,
+        @RequestParam(required = false) String planned_date,
+        @RequestParam(required = false) String planned_time,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "100") int size
     )
     {
-        return flightRepository.findAll()
-            .filter(flight -> airline_code == null || flight.getAirline_code().equals(airline_code))
-            .filter(flight -> flight_number == null || flight.getFlight_number().equals(flight_number))
-            .filter(flight -> scheduled_date == null || flight.getScheduled_time().contains(scheduled_date))
-            .filter(flight -> scheduled_time == null || flight.getScheduled_time().contains(scheduled_time))
-            .filter(flight -> planned_date == null || flight.getPlanned_time().contains(planned_date))
-            .filter(flight -> planned_time == null || flight.getPlanned_time().contains(planned_time))
-            .map(flight -> objectMapper.convertValue(flight, JsonNode.class))
-            .collectList()
-            .map(results -> ResponseEntity.ok().body(results));
+        Query query = new Query();
+        if (airline_code != null) query.addCriteria(Criteria.where("airline_code").is(airline_code));
+        if (flight_number != null) query.addCriteria(Criteria.where("flight_number").is(flight_number));
+
+        if (scheduled_date != null)
+            query.addCriteria(Criteria.where("scheduled_time").regex("^" + java.util.regex.Pattern.quote(scheduled_date)));
+
+        if (scheduled_time != null)
+        {
+            if (scheduled_time.matches("\\d{4}-\\d{2}-\\d{2}"))
+                query.addCriteria(Criteria.where("scheduled_time").regex("^" + java.util.regex.Pattern.quote(scheduled_time)));
+            else
+                query.addCriteria(Criteria.where("scheduled_time").regex(java.util.regex.Pattern.quote(scheduled_time) + "$"));
+        }
+
+        if (planned_date != null)
+            query.addCriteria(Criteria.where("planned_time").regex("^" + java.util.regex.Pattern.quote(planned_date)));
+        if (planned_time != null)
+            query.addCriteria(Criteria.where("planned_time").regex(java.util.regex.Pattern.quote(planned_time) + "$"));
+
+        int limit = Math.min(size, 500);
+        int skip = Math.max(page, 0) * limit;
+        query.skip(skip).limit(limit);
+        query.with(Sort.by(Sort.Direction.DESC, "lastUpdated"));
+        return mongoTemplate.find(query, FlightModel.class);
     }
 }

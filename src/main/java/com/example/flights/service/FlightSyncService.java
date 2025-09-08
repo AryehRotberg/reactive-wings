@@ -31,15 +31,13 @@ public class FlightSyncService {
     
     public FlightSyncService(FlightRepository flightRepository, 
                             BenGurionAPI bgnAPI, 
-                            ObjectMapper objectMapper) {
+                            ObjectMapper objectMapper)
+    {
         this.flightRepository = flightRepository;
         this.bgnAPI = bgnAPI;
         this.objectMapper = objectMapper;
     }
     
-    /**
-     * Sync flights every minute (adjust as needed)
-     */
     @Scheduled(fixedDelay = 60000)
     public void syncFlightsFromAPI() {
         if (!syncInProgress.compareAndSet(false, true)) {
@@ -56,10 +54,8 @@ public class FlightSyncService {
             .subscribe();
     }
     
-    /**
-     * Simple approach: Mark old, save new, delete old
-     */
-    private Mono<Long> fetchAndReplaceFlights() {
+    private Mono<Long> fetchAndReplaceFlights()
+    {
         LocalDateTime syncTime = LocalDateTime.now();
         
         return bgnAPI.getBenGurionFlights()
@@ -80,29 +76,6 @@ public class FlightSyncService {
                 return flightRepository.deleteByLastUpdatedBefore(syncTime)
                     .doOnSuccess(deleted -> log.debug("Removed {} outdated records", deleted))
                     .thenReturn(batchCount * batchSize);
-            });
-    }
-    
-    /**
-     * Alternative: Complete replacement (simpler but brief downtime)
-     */
-    private Mono<Long> fetchAndReplaceAllFlights() {
-        return bgnAPI.getBenGurionFlights()
-            .timeout(Duration.ofSeconds(30))
-            .retryWhen(Retry.backoff(3, Duration.ofSeconds(2)))
-            .map(data -> data.path("result").path("records"))
-            .flatMapMany(records -> Flux.fromIterable(records))
-            .map(record -> objectMapper.convertValue(record, FlightModel.class))
-            .collectList()
-            .flatMap(flights -> {
-                if (flights.isEmpty()) {
-                    log.warn("No flights received from API");
-                    return Mono.just(0L);
-                }
-                
-                // Delete all then insert new (simple but has brief downtime)
-                return flightRepository.deleteAll()
-                    .then(flightRepository.saveAll(flights).count());
             });
     }
 }

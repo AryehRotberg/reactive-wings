@@ -3,6 +3,8 @@ package com.example.flights.service;
 import java.time.Instant;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,8 @@ import reactor.core.scheduler.Schedulers;
 @Service
 public class SubscriptionService
 {
+    private static final Logger log = LoggerFactory.getLogger(SubscriptionService.class);
+
     private final FlightRepository flightRepository;
     private final UserRepository userRepository;
     private final EmailSenderService emailSenderService;
@@ -33,19 +37,19 @@ public class SubscriptionService
     @Scheduled(cron = "1/10 * * * * *")
     public void checkSubscriptions()
     {
-        System.out.println("Synchronizing flight statuses...");
+        log.info("Synchronizing flight statuses...");
 
         flightRepository.findAll()
         .collectList()
-        .doOnNext(flights -> System.out.println("Found " + flights.size() + " flights in database"))
+        .doOnNext(flights -> log.info("Found " + flights.size() + " flights in database"))
         .flatMapMany(flights -> userRepository.findAll()
-            .doOnNext(user -> System.out.println("Checking subscriptions for user: " + user.getEmail()))
+            .doOnNext(user -> log.info("Checking subscriptions for user: " + user.getEmail()))
             .flatMap(user -> processUserSubscriptions(user, flights)))
             .subscribeOn(Schedulers.boundedElastic())
         .subscribe(
             result -> {},
-            error -> System.err.println("Error in subscription check: " + error.getMessage()),
-            () -> System.out.println("Subscription check completed")
+            error -> log.error("Error in subscription check: " + error.getMessage()),
+            () -> log.info("Subscription check completed")
         );
     }
 
@@ -55,7 +59,6 @@ public class SubscriptionService
 
         for (SubscriptionModel sub : user.getSubscriptions())
         {
-            // Find matching flights for this subscription (there might be multiple due to direction differences)
             List<FlightModel> matchingFlights = flights.stream()
                 .filter(flight -> isFlightMatchingSubscription(flight, sub))
                 .toList();
@@ -168,7 +171,7 @@ public class SubscriptionService
         if (hasChanges)
         {
             sub.setLast_updated(Instant.now().toString());
-            System.out.println("User " + user.getEmail() + " notified about flight " + sub.getFlight_number() + " changes: " + changeLog.toString());
+            log.info("User " + user.getEmail() + " notified about flight " + sub.getFlight_number() + " changes: " + changeLog.toString());
             
             if (emailSenderService != null)
             {
@@ -179,13 +182,13 @@ public class SubscriptionService
                     changeLog.toString()
                 ).subscribe(
                     null,
-                    error -> System.err.println("Failed to send email to " + user.getEmail() + ": " + error.getMessage()),
-                    () -> System.out.println("Email notification sent successfully to " + user.getEmail())
+                    error -> log.error("Failed to send email to " + user.getEmail() + ": " + error.getMessage()),
+                    () -> log.info("Email notification sent successfully to " + user.getEmail())
                 );
             }
             
             else
-                System.out.println("Email service not available - notification logged only");
+                log.warn("Email service not available - notification logged only");
         }
         
         return hasChanges;
