@@ -29,7 +29,7 @@ public class FlightModel
     private String scheduled_time;
 
     @JsonAlias("CHPTOL")
-    private String planned_time;
+    private String estimated_time;
 
     @JsonAlias("CHAORD")
     private String direction;
@@ -91,8 +91,8 @@ public class FlightModel
     public String getScheduled_time() { return scheduled_time; }
     public void setScheduled_time(String scheduled_time) { this.scheduled_time = scheduled_time; }
 
-    public String getPlanned_time() { return planned_time; }
-    public void setPlanned_time(String planned_time) { this.planned_time = planned_time; }
+    public String getestimated_time() { return estimated_time; }
+    public void setestimated_time(String estimated_time) { this.estimated_time = estimated_time; }
 
     public String getDirection() { return direction; }
     public void setDirection(String direction) { this.direction = direction; }

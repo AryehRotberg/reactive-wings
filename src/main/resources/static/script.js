@@ -1,4 +1,4 @@
-// const url = "http://34.61.135.49.nip.io:8080/";
+// const url = "http://34.69.48.95.nip.io:8080/";
 const url = "http://localhost:8080/";
 let currentSubscriptions = [];
 
@@ -143,7 +143,7 @@ async function loadUserSubscriptions() {
                 </div>
                 <div class="detail-item">
                 <span class="detail-label">Estimated Time</span>
-                <span class="detail-value">${formatDate(sub.planned_time)}</span>
+                <span class="detail-value">${formatDate(sub.estimated_time)}</span>
                 </div>
                 <div class="detail-item">
                 <span class="detail-label">Destination</span>
@@ -273,7 +273,7 @@ document.getElementById("subscriptionForm").addEventListener("submit", async fun
         airline_code: result[0].airline_code,
         flight_number: result[0].flight_number,
         scheduled_time: result[0].scheduled_time,
-        planned_time: result[0].planned_time,
+        estimated_time: result[0].estimated_time,
         last_status: result[0].status_en,
         last_updated: new Date().toISOString(),
         airport_code: result[0].airport_code,

@@ -86,7 +86,7 @@ graph TB
   - `scheduled_date` - Filter by scheduled date
   - `scheduled_time` - Filter by scheduled time
   - `planned_date` - Filter by planned date
-  - `planned_time` - Filter by planned time
+  - `estimated_time` - Filter by planned time
 
 ### User Operations (Authentication Required)
 - `GET /users/user-info` - Get current user profile and subscriptions
@@ -270,7 +270,7 @@ GOOGLE_CLIENT_SECRET=your-google-client-secret
   "flight_number": "LY001", 
   "airline_name": "El Al Israel Airlines",
   "scheduled_time": "2025-09-07T10:30:00",
-  "planned_time": "2025-09-07T10:35:00",
+  "estimated_time": "2025-09-07T10:35:00",
   "direction": "Departure/Arrival",
   "airport_code": "JFK",
   "city_en": "New York",
@@ -296,7 +296,7 @@ GOOGLE_CLIENT_SECRET=your-google-client-secret
       "airline_code": "EL AL",
       "flight_number": "LY001",
       "scheduled_time": "2025-09-07T10:30:00",
-      "planned_time": "2025-09-07T10:35:00",
+      "estimated_time": "2025-09-07T10:35:00",
       "last_status": "On Time",
       "last_updated": "2025-09-07T15:30:00",
       "airport_code": "JFK",

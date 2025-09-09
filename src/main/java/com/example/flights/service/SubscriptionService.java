@@ -102,14 +102,14 @@ public class SubscriptionService
             hasChanges = true;
         }
 
-        if (!safeEquals(flightData.getPlanned_time(), sub.getPlanned_time()))
+        if (!safeEquals(flightData.getestimated_time(), sub.getestimated_time()))
         {
             changeLog.append("Planned time: ")
-                    .append(sub.getPlanned_time())
+                    .append(sub.getestimated_time())
                     .append(" \u2192 ")
-                    .append(flightData.getPlanned_time())
+                    .append(flightData.getestimated_time())
                     .append("<br>");
-            sub.setPlanned_time(flightData.getPlanned_time());
+            sub.setestimated_time(flightData.getestimated_time());
             hasChanges = true;
         }
 

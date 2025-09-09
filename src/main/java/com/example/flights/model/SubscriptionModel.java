@@ -5,7 +5,7 @@ public class SubscriptionModel
     private String flight_number;
     private String airline_code;
     private String scheduled_time;
-    private String planned_time;
+    private String estimated_time;
     private String last_updated;
     private String airport_code;
     private String city_en;
@@ -26,8 +26,8 @@ public class SubscriptionModel
     public String getScheduled_time() { return scheduled_time; }
     public void setScheduled_time(String scheduled_time) { this.scheduled_time = scheduled_time; }
 
-    public String getPlanned_time() { return planned_time; }
-    public void setPlanned_time(String planned_time) { this.planned_time = planned_time; }
+    public String getestimated_time() { return estimated_time; }
+    public void setestimated_time(String estimated_time) { this.estimated_time = estimated_time; }
 
     public String getAirport_code() { return airport_code; }
     public void setAirport_code(String airport_code) { this.airport_code = airport_code; }
@@ -59,7 +59,7 @@ public class SubscriptionModel
                 "airline_code='" + airline_code + '\'' +
                 ", flight_number='" + flight_number + '\'' +
                 ", scheduled_time='" + scheduled_time + '\'' +
-                ", planned_time='" + planned_time + '\'' +
+                ", estimated_time='" + estimated_time + '\'' +
                 ", last_updated='" + last_updated + '\'' +
                 ", airport_code='" + airport_code + '\'' +
                 ", city_en='" + city_en + '\'' +

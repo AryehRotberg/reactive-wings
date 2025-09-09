@@ -74,7 +74,7 @@ window.FlightApp.subscriptions = {
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">Estimated Time</span>
-                        <span class="detail-value">${window.FlightApp.utils.formatDate(sub.planned_time)}</span>
+                        <span class="detail-value">${window.FlightApp.utils.formatDate(sub.estimated_time)}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">Destination</span>
@@ -181,7 +181,7 @@ window.FlightApp.subscriptions = {
                 airline_code: searchResults[0].airline_code,
                 flight_number: searchResults[0].flight_number,
                 scheduled_time: searchResults[0].scheduled_time,
-                planned_time: searchResults[0].planned_time,
+                estimated_time: searchResults[0].estimated_time,
                 last_status: searchResults[0].status_en,
                 last_updated: new Date().toISOString(),
                 airport_code: searchResults[0].airport_code,

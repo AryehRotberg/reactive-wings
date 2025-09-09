@@ -43,7 +43,7 @@ public class FlightsController
         @RequestParam(required = false) String scheduled_date,
         @RequestParam(required = false) String scheduled_time,
         @RequestParam(required = false) String planned_date,
-        @RequestParam(required = false) String planned_time,
+        @RequestParam(required = false) String estimated_time,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "100") int size
     )
@@ -64,9 +64,9 @@ public class FlightsController
         }
 
         if (planned_date != null)
-            query.addCriteria(Criteria.where("planned_time").regex("^" + java.util.regex.Pattern.quote(planned_date)));
-        if (planned_time != null)
-            query.addCriteria(Criteria.where("planned_time").regex(java.util.regex.Pattern.quote(planned_time) + "$"));
+            query.addCriteria(Criteria.where("estimated_time").regex("^" + java.util.regex.Pattern.quote(planned_date)));
+        if (estimated_time != null)
+            query.addCriteria(Criteria.where("estimated_time").regex(java.util.regex.Pattern.quote(estimated_time) + "$"));
 
         int limit = Math.min(size, 500);
         int skip = Math.max(page, 0) * limit;
