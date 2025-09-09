@@ -223,7 +223,15 @@ input:focus, select:focus {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(30, 60, 114, 0.2);
+    /* box-shadow: 0 4px 15px rgba(30, 60, 114, 0.2); */
+    /* Ensure consistent dimensions */
+    min-width: fit-content;
+    box-sizing: border-box;
+    white-space: nowrap;
+    /* Prevent border-radius changes */
+    border-radius: 8px;
+    /* Ensure consistent display */
+    display: inline-block;
 }
 
 .btn:hover {
@@ -633,41 +641,75 @@ input:focus, select:focus {
     margin-bottom: 20px;
 }
 
-/* Button loading states - spinner next to button */
+/* Button loading states - preserve button dimensions */
 .btn.loading {
     pointer-events: none;
-    /* Remove opacity change that might cause visual squeeze */
+    /* Maintain all original styles - no changes to dimensions */
 }
 
-/* Ensure buttons themselves never rotate or change size */
-.btn, .btn * {
-    transform: none !important;
+/* Ensure buttons maintain their exact original shape and size */
+.btn {
+    /* Add specific dimensions to prevent shape changes */
+    min-width: fit-content;
+    box-sizing: border-box;
+    white-space: nowrap;
 }
 
-.btn.loading, .btn.loading * {
+/* Prevent any transforms or animations from affecting button shape */
+.btn.loading {
     transform: none !important;
     animation: none !important;
-}
-
-/* Prevent any size/layout changes during loading */
-.btn.loading {
-    width: auto !important;
-    height: auto !important;
-    padding: inherit !important;
-    margin: inherit !important;
+    /* Preserve exact original dimensions */
+    width: initial !important;
+    height: initial !important;
+    min-width: initial !important;
+    min-height: initial !important;
+    /* Maintain original padding and margins */
+    padding: 12px 15px !important;
+    margin: initial !important;
+    /* Keep border-radius consistent */
+    border-radius: 8px !important;
+    /* Ensure box-sizing doesn't change */
     box-sizing: border-box !important;
 }
 
-/* Remove the ::before pseudo-element that was putting spinner inside button */
-.btn.loading::before {
-    display: none;
+/* Refresh button specific loading state */
+.btn-refresh.loading {
+    padding: 10px 20px !important;
+    width: auto !important;
 }
 
+/* Mobile button loading adjustments */
+@media (max-width: 768px) {
+    .btn.loading {
+        padding: 14px 12px !important;
+    }
+    
+    .btn-refresh.loading {
+        padding: 12px 15px !important;
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .btn.loading {
+        padding: 12px 10px !important;
+    }
+}
+
+/* Remove any pseudo-elements that might affect button layout */
+.btn.loading::before,
+.btn.loading::after {
+    display: none !important;
+}
+
+/* Ensure text content maintains layout */
 .btn.loading .btn-text {
-    margin-left: 0; /* Reset margin */
+    margin-left: 0;
+    display: inline;
 }
 
-/* Show the emoji icons always */
+/* Show the emoji icons always - they help maintain button width */
 .btn.loading .btn-icon {
     display: inline;
 }
@@ -677,7 +719,7 @@ input:focus, select:focus {
     margin-right: 8px;
 }
 
-/* Loading spinner next to buttons */
+/* Loading spinner next to buttons - positioned externally */
 .loading-spinner-beside {
     display: inline-block;
     width: 20px;
@@ -688,6 +730,9 @@ input:focus, select:focus {
     animation: spin 1s linear infinite;
     margin-left: 10px;
     vertical-align: middle;
+    /* Ensure spinner doesn't affect button layout */
+    position: relative;
+    flex-shrink: 0;
 }
 
 /* Section loading overlay - simplified */
@@ -711,7 +756,36 @@ input:focus, select:focus {
     z-index: 11;
 }
 
-/* Additional mobile improvements */
+/* Button container stability during loading */
+.form-group,
+.subscription-item,
+.section {
+    /* Ensure containers don't change layout during button loading */
+    contain: layout;
+}
+
+/* Prevent flex/grid layouts from affecting button dimensions during loading */
+.btn-refresh {
+    /* Ensure refresh button maintains its dimensions */
+    flex-shrink: 0;
+    min-width: fit-content;
+}
+
+/* Additional button stability rules */
+.btn:not(.loading) {
+    /* Normal button state - allow transitions */
+    transition: all 0.3s ease;
+}
+
+.btn.loading {
+    /* Loading button state - lock dimensions and disable transitions */
+    transition: none !important;
+    transform: none !important;
+    /* Force exact dimensional preservation */
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    min-width: fit-content !important;
+}
 @media (max-width: 768px) {
     /* Improve touch targets */
     .btn {
