@@ -7,6 +7,7 @@ public class SubscriptionModel
     private String scheduled_time;
     private String estimated_time;
     private String last_updated;
+    private String airline_name;
     private String airport_code;
     private String city_en;
     private String country_en;
@@ -47,6 +48,9 @@ public class SubscriptionModel
     public String getCheckin_zone() { return checkin_zone; }
     public void setCheckin_zone(String checkin_zone) { this.checkin_zone = checkin_zone; }
 
+    public String getAirline_name() { return airline_name; }
+    public void setAirline_name(String airline_name) { this.airline_name = airline_name; }
+
     public String getLast_updated() { return last_updated; }
     public void setLast_updated(String last_updated) { this.last_updated = last_updated; }
     
@@ -62,6 +66,7 @@ public class SubscriptionModel
                 ", estimated_time='" + estimated_time + '\'' +
                 ", last_updated='" + last_updated + '\'' +
                 ", airport_code='" + airport_code + '\'' +
+                ", airline_name='" + airline_name + '\'' +
                 ", city_en='" + city_en + '\'' +
                 ", country_en='" + country_en + '\'' +
                 ", terminal='" + terminal + '\'' +

@@ -81,6 +81,7 @@ public class SubscriptionService
         if (sub.getFlight_number() != null) q.addCriteria(Criteria.where("flight_number").is(sub.getFlight_number()));
         if (sub.getScheduled_time() != null) q.addCriteria(Criteria.where("scheduled_time").is(sub.getScheduled_time()));
         if (sub.getAirport_code() != null) q.addCriteria(Criteria.where("airport_code").is(sub.getAirport_code()));
+        if (sub.getAirline_name() != null) q.addCriteria(Criteria.where("airline_name").is(sub.getAirline_name()));
         q.with(Sort.by(Sort.Direction.DESC, "lastUpdated"));
         q.limit(1);
         return mongoTemplate.findOne(q, FlightModel.class);

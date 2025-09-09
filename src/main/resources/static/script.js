@@ -1,5 +1,5 @@
-// const url = "http://34.69.48.95.nip.io:8080/";
-const url = "http://localhost:8080/";
+const url = "http://34.69.48.95.nip.io:8080/";
+// const url = "http://localhost:8080/";
 let currentSubscriptions = [];
 
 // Show/hide page loading overlay
@@ -142,6 +142,10 @@ async function loadUserSubscriptions() {
                 <span class="detail-value"><span class="flight-icon">✈️</span>${sub.airline_code} ${sub.flight_number}</span>
                 </div>
                 <div class="detail-item">
+                <span class="detail-label">Airline Company</span>
+                <span class="detail-value">${sub.airline_name}</span>
+                </div>
+                <div class="detail-item">
                 <span class="detail-label">Estimated Time</span>
                 <span class="detail-value">${formatDate(sub.estimated_time)}</span>
                 </div>
@@ -276,6 +280,7 @@ document.getElementById("subscriptionForm").addEventListener("submit", async fun
         estimated_time: result[0].estimated_time,
         last_status: result[0].status_en,
         last_updated: new Date().toISOString(),
+        airline_name: result[0].airline_name,
         airport_code: result[0].airport_code,
         city_en: result[0].city_en,
         city_he: result[0].city_he,
