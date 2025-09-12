@@ -1,5 +1,4 @@
-const url = "http://34.123.99.78.nip.io:8080/";
-// const url = "http://localhost:8080/";
+const url = "/";
 let currentSubscriptions = [];
 
 // Show/hide page loading overlay
