@@ -1,4 +1,4 @@
-const url = "http://34.69.48.95.nip.io:8080/";
+const url = "http://34.123.99.78.nip.io:8080/";
 // const url = "http://localhost:8080/";
 let currentSubscriptions = [];
 
