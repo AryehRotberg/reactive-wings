@@ -41,9 +41,10 @@ public class FlightsController
         @RequestParam(required = false) String airline_code,
         @RequestParam(required = false) String flight_number,
         @RequestParam(required = false) String scheduled_date,
-        @RequestParam(required = false) String scheduled_time,
-        @RequestParam(required = false) String planned_date,
-        @RequestParam(required = false) String estimated_time,
+        @RequestParam(required = false) String estimated_date,
+        @RequestParam(required = false) String direction,
+        @RequestParam(required = false) String city_name,
+        @RequestParam(required = false) String status,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "100") int size
     )
@@ -51,22 +52,15 @@ public class FlightsController
         Query query = new Query();
         if (airline_code != null) query.addCriteria(Criteria.where("airline_code").is(airline_code));
         if (flight_number != null) query.addCriteria(Criteria.where("flight_number").is(flight_number));
+        if (flight_number != null) query.addCriteria(Criteria.where("direction").is(direction));
+        if (flight_number != null) query.addCriteria(Criteria.where("city_name").is(city_name));
+        if (flight_number != null) query.addCriteria(Criteria.where("status").is(status));
 
         if (scheduled_date != null)
             query.addCriteria(Criteria.where("scheduled_time").regex("^" + java.util.regex.Pattern.quote(scheduled_date)));
 
-        if (scheduled_time != null)
-        {
-            if (scheduled_time.matches("\\d{4}-\\d{2}-\\d{2}"))
-                query.addCriteria(Criteria.where("scheduled_time").regex("^" + java.util.regex.Pattern.quote(scheduled_time)));
-            else
-                query.addCriteria(Criteria.where("scheduled_time").regex(java.util.regex.Pattern.quote(scheduled_time) + "$"));
-        }
-
-        if (planned_date != null)
-            query.addCriteria(Criteria.where("estimated_time").regex("^" + java.util.regex.Pattern.quote(planned_date)));
-        if (estimated_time != null)
-            query.addCriteria(Criteria.where("estimated_time").regex(java.util.regex.Pattern.quote(estimated_time) + "$"));
+        if (estimated_date != null)
+            query.addCriteria(Criteria.where("estimated_time").regex("^" + java.util.regex.Pattern.quote(estimated_date)));
 
         int limit = Math.min(size, 500);
         int skip = Math.max(page, 0) * limit;
