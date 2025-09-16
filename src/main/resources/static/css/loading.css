@@ -1,0 +1,187 @@
+/**
+ * Loading Styles
+ * Loading states, spinners, overlays, and animation styles
+ */
+
+/* === BASIC SPINNERS === */
+.loading {
+    display: inline-block;
+    width: var(--spinner-size-base);
+    height: var(--spinner-size-base);
+    border: 3px solid var(--border-gray);
+    border-top: 3px solid var(--accent-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.spinner {
+    display: inline-block;
+    width: var(--spinner-size-base);
+    height: var(--spinner-size-base);
+    border: 3px solid var(--border-gray);
+    border-top: 3px solid var(--accent-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 10px;
+}
+
+.spinner-large {
+    width: 40px;
+    height: 40px;
+    border-width: 4px;
+}
+
+.spinner-small {
+    width: var(--spinner-size-sm);
+    height: var(--spinner-size-sm);
+    border-width: 2px;
+}
+
+/* === PAGE LOADING OVERLAY === */
+.page-loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(30, 60, 114, 0.9);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: var(--z-overlay);
+    color: var(--white);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+}
+
+.page-loading-overlay .spinner {
+    width: var(--spinner-size-xl);
+    height: var(--spinner-size-xl);
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid var(--white);
+    margin-bottom: var(--spacing-xl);
+}
+
+/* === BUTTON LOADING STATES === */
+.btn.loading {
+    pointer-events: none;
+    /* Maintain all original styles - no changes to dimensions */
+}
+
+/* Ensure buttons maintain their exact original shape and size */
+.btn {
+    /* Add specific dimensions to prevent shape changes */
+    min-width: fit-content;
+    box-sizing: border-box;
+    white-space: nowrap;
+}
+
+/* Prevent any transforms or animations from affecting button shape */
+.btn.loading {
+    transform: none !important;
+    animation: none !important;
+    /* Preserve exact original dimensions */
+    width: initial !important;
+    height: initial !important;
+    min-width: initial !important;
+    min-height: initial !important;
+    /* Maintain original padding and margins */
+    padding: var(--spacing-md) var(--spacing-lg) !important;
+    margin: initial !important;
+    /* Keep border-radius consistent */
+    border-radius: var(--radius-md) !important;
+    /* Ensure box-sizing doesn't change */
+    box-sizing: border-box !important;
+}
+
+/* Refresh button specific loading state */
+.btn-refresh.loading {
+    padding: 10px var(--spacing-xl) !important;
+    width: auto !important;
+}
+
+/* Remove any pseudo-elements that might affect button layout */
+.btn.loading::before,
+.btn.loading::after {
+    display: none !important;
+}
+
+/* Ensure text content maintains layout */
+.btn.loading .btn-text {
+    margin-left: 0;
+    display: inline;
+}
+
+/* Show the emoji icons always - they help maintain button width */
+.btn.loading .btn-icon {
+    display: inline;
+}
+
+/* === LOADING SPINNER BESIDE BUTTONS === */
+.loading-spinner-beside {
+    display: inline-block;
+    width: var(--spinner-size-base);
+    height: var(--spinner-size-base);
+    border: 2px solid var(--border-gray);
+    border-top: 2px solid var(--accent-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 10px;
+    vertical-align: middle;
+    /* Ensure spinner doesn't affect button layout */
+    position: relative;
+    flex-shrink: 0;
+}
+
+/* === SECTION LOADING OVERLAY === */
+.section-loading {
+    position: relative;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.section-loading::after {
+    content: '';
+    position: absolute;
+    top: var(--spacing-xl);
+    right: var(--spacing-xl);
+    width: var(--spinner-size-lg);
+    height: var(--spinner-size-lg);
+    border: 3px solid var(--border-gray);
+    border-top: 3px solid var(--accent-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 11;
+}
+
+/* === CONTAINER STABILITY DURING LOADING === */
+.form-group,
+.subscription-item,
+.section {
+    /* Ensure containers don't change layout during button loading */
+    contain: layout;
+}
+
+/* Prevent flex/grid layouts from affecting button dimensions during loading */
+.btn-refresh {
+    /* Ensure refresh button maintains its dimensions */
+    flex-shrink: 0;
+    min-width: fit-content;
+}
+
+/* === LOADING STATE TRANSITIONS === */
+.btn:not(.loading) {
+    /* Normal button state - allow transitions */
+    transition: var(--transition-base);
+}
+
+.btn.loading {
+    /* Loading button state - lock dimensions and disable transitions */
+    transition: none !important;
+    transform: none !important;
+    /* Force exact dimensional preservation */
+    flex-shrink: 0 !important;
+    flex-grow: 0 !important;
+    min-width: fit-content !important;
+}

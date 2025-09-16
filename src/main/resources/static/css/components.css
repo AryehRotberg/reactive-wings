@@ -1,0 +1,204 @@
+/**
+ * Component Styles
+ * Buttons, forms, messages, subscriptions, and reusable UI components
+ */
+
+/* === BUTTONS === */
+.btn {
+    background: var(--primary-gradient);
+    color: var(--white);
+    border: none;
+    cursor: pointer;
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: var(--transition-base);
+    min-width: fit-content;
+    box-sizing: border-box;
+    white-space: nowrap;
+    border-radius: var(--radius-md);
+    display: inline-block;
+    padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-button-hover);
+    background: linear-gradient(135deg, var(--accent-blue) 0%, var(--primary-blue) 100%);
+}
+
+.btn:focus {
+    outline: 2px solid var(--accent-blue);
+    outline-offset: 2px;
+}
+
+.btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 8px rgba(30, 60, 114, 0.3);
+}
+
+/* Button Variants */
+.btn-danger {
+    background: var(--danger-gradient);
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.2);
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
+    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
+}
+
+.btn-refresh {
+    background: var(--secondary-gradient);
+    width: auto;
+    padding: 10px var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2);
+}
+
+.btn-refresh:hover {
+    background: linear-gradient(135deg, var(--dark-sky-blue) 0%, var(--sky-blue) 100%);
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
+}
+
+.btn-logout {
+    background: var(--orange-gradient);
+    width: auto;
+    padding: 10px var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+    box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2);
+}
+
+.btn-logout:hover {
+    background: linear-gradient(135deg, var(--orange) 0%, var(--orange) 100%);
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.1);
+}
+
+/* Button Icons */
+.btn-icon {
+    margin-right: var(--spacing-sm);
+}
+
+.btn-text {
+    margin-left: 0;
+    display: inline;
+}
+
+/* === FORMS === */
+.form-group {
+    margin-bottom: var(--spacing-xl);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: var(--spacing-sm);
+    color: var(--primary-blue);
+    font-weight: var(--font-weight-semibold);
+    font-size: 0.9em;
+}
+
+input, select, button {
+    width: 100%;
+    padding: var(--spacing-md) var(--spacing-lg);
+    border: 2px solid var(--border-gray);
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    transition: var(--transition-base);
+    font-family: inherit;
+    background: var(--white);
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.15);
+    background: var(--light-gray);
+}
+
+/* === MESSAGES === */
+.message {
+    padding: var(--spacing-lg) var(--spacing-xl);
+    border-radius: var(--radius-md);
+    margin: var(--spacing-lg) 0;
+    font-weight: var(--font-weight-medium);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.message.error {
+    background: var(--error-bg);
+    color: var(--error-color);
+    border-left: 4px solid var(--error-border);
+    border-radius: var(--radius-md);
+}
+
+.message.success {
+    background: var(--success-bg);
+    color: var(--success-color);
+    border-left: 4px solid var(--success-border);
+    border-radius: var(--radius-md);
+}
+
+/* === SUBSCRIPTION COMPONENTS === */
+.subscription-item {
+    background: var(--surface-gradient);
+    border: 1px solid var(--border-gray);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    margin: var(--spacing-lg) 0;
+    transition: var(--transition-base);
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+}
+
+.subscription-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(30, 60, 114, 0.1);
+}
+
+.subscription-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-blue) 0%, var(--accent-blue) 50%, var(--light-blue) 100%);
+}
+
+.subscription-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.detail-label {
+    font-size: var(--font-size-sm);
+    color: var(--text-gray);
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: var(--spacing-xs);
+}
+
+.detail-value {
+    color: var(--primary-blue);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-base);
+}
+
+/* Flight Icon */
+.flight-icon {
+    display: inline-block;
+    margin-right: var(--spacing-sm);
+    color: var(--accent-blue);
+    filter: drop-shadow(0 1px 2px rgba(42, 82, 152, 0.3));
+}

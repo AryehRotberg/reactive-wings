@@ -1,16 +1,16 @@
 /**
- * API Functions
+ * API Service Module
+ * Handles all HTTP requests to the backend API
  */
 
-window.FlightApp = window.FlightApp || {};
+const API = {
+    baseUrl: "/",
 
-window.FlightApp.api = {
     /**
      * Fetch user information and subscriptions
-     * @returns {Promise<Object>} User information object
      */
-    async fetchUserInfo() {
-        const response = await fetch(window.FlightApp.config.API_BASE_URL + "users/user-info", {
+    async getUserInfo() {
+        const response = await fetch(this.baseUrl + "users/user-info", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json"
@@ -26,14 +26,9 @@ window.FlightApp.api = {
 
     /**
      * Search for flights
-     * @param {string} airlineCode - Airline code
-     * @param {string} flightNumber - Flight number
-     * @param {string} scheduledTime - Scheduled time
-     * @returns {Promise<Array>} Flight search results
      */
     async searchFlights(airlineCode, flightNumber, scheduledTime) {
-        const searchUrl = window.FlightApp.config.API_BASE_URL + 
-            `flights/search?airline_code=${airlineCode}&flight_number=${flightNumber}&scheduled_time=${scheduledTime}`;
+        const searchUrl = `${this.baseUrl}flights/search?airline_code=${airlineCode}&flight_number=${flightNumber}&scheduled_time=${scheduledTime}`;
         
         const response = await fetch(searchUrl, {
             method: "GET",
@@ -50,12 +45,10 @@ window.FlightApp.api = {
     },
 
     /**
-     * Subscribe to a flight
-     * @param {Object} flightData - Flight data to subscribe to
-     * @returns {Promise<Object>} Subscription response
+     * Subscribe to flight updates
      */
     async subscribeToFlight(flightData) {
-        const response = await fetch(window.FlightApp.config.API_BASE_URL + "users/subscribe", {
+        const response = await fetch(this.baseUrl + "users/subscribe", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -71,20 +64,16 @@ window.FlightApp.api = {
     },
 
     /**
-     * Unsubscribe from a flight
-     * @param {string} airlineCode - Airline code
-     * @param {string} flightNumber - Flight number
-     * @param {string} scheduledDate - Scheduled date
-     * @returns {Promise<Object>} Unsubscribe response
+     * Unsubscribe from flight updates
      */
-    async unsubscribeFromFlight(airlineCode, flightNumber, scheduledDate) {
+    async unsubscribeFromFlight(airlineCode, flightNumber, scheduledTime) {
         const params = new URLSearchParams({
             airline_code: airlineCode,
             flight_number: flightNumber,
-            scheduled_date: scheduledDate
+            scheduled_date: scheduledTime
         });
 
-        const response = await fetch(window.FlightApp.config.API_BASE_URL + "users/unsubscribe?" + params.toString(), {
+        const response = await fetch(this.baseUrl + "users/unsubscribe?" + params.toString(), {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"

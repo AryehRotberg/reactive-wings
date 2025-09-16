@@ -1,27 +1,23 @@
 /**
- * UI Management Functions
+ * Loading States Module
+ * Manages loading indicators for different UI elements
  */
 
-window.FlightApp = window.FlightApp || {};
-
-window.FlightApp.ui = {
+const LoadingManager = {
+    
     /**
-     * Show page loading overlay
+     * Show/hide page loading overlay
      */
     showPageLoading() {
         document.getElementById('pageLoadingOverlay').style.display = 'flex';
     },
 
-    /**
-     * Hide page loading overlay
-     */
     hidePageLoading() {
         document.getElementById('pageLoadingOverlay').style.display = 'none';
     },
 
     /**
-     * Show section loading state
-     * @param {string} sectionId - ID of the section element
+     * Show/hide section loading
      */
     showSectionLoading(sectionId) {
         const section = document.getElementById(sectionId);
@@ -30,10 +26,6 @@ window.FlightApp.ui = {
         }
     },
 
-    /**
-     * Hide section loading state
-     * @param {string} sectionId - ID of the section element
-     */
     hideSectionLoading(sectionId) {
         const section = document.getElementById(sectionId);
         if (section) {
@@ -42,20 +34,22 @@ window.FlightApp.ui = {
     },
 
     /**
-     * Show button loading state
-     * @param {string} buttonId - ID of the button element
+     * Show/hide button loading
      */
     showButtonLoading(buttonId) {
         const button = document.getElementById(buttonId);
         if (button) {
             // Store original styles to prevent any changes
             const originalStyle = button.style.cssText;
+            const originalClasses = button.className;
             button.dataset.originalStyle = originalStyle;
+            button.dataset.originalClasses = originalClasses;
             
+            // Add loading class and disable button
             button.classList.add('loading');
             button.disabled = true;
             
-            // Add spinner next to button
+            // Add spinner next to button (not inside)
             const spinner = document.createElement('div');
             spinner.className = 'loading-spinner-beside';
             spinner.id = buttonId + '_spinner';
@@ -63,13 +57,10 @@ window.FlightApp.ui = {
         }
     },
 
-    /**
-     * Hide button loading state
-     * @param {string} buttonId - ID of the button element
-     */
     hideButtonLoading(buttonId) {
         const button = document.getElementById(buttonId);
         if (button) {
+            // Remove loading class and re-enable button
             button.classList.remove('loading');
             button.disabled = false;
             
@@ -79,31 +70,16 @@ window.FlightApp.ui = {
                 delete button.dataset.originalStyle;
             }
             
+            // Restore original classes if needed
+            if (button.dataset.originalClasses !== undefined) {
+                delete button.dataset.originalClasses;
+            }
+            
             // Remove spinner
             const spinner = document.getElementById(buttonId + '_spinner');
             if (spinner) {
                 spinner.remove();
             }
         }
-    },
-
-    /**
-     * Display success or error messages
-     * @param {string} elementId - ID of the element to show message in
-     * @param {string} message - Message to display
-     * @param {boolean} isError - Whether this is an error message
-     */
-    showMessage(elementId, message, isError = false) {
-        const element = document.getElementById(elementId);
-        if (!element) {
-            console.warn(`Element with id '${elementId}' not found. Message: ${message}`);
-            return;
-        }
-        element.innerHTML = `<div class="message ${isError ? 'error' : 'success'}">${isError ? '❌' : '✅'} ${message}</div>`;
-        setTimeout(() => {
-            if (element) {
-                element.innerHTML = '';
-            }
-        }, 5000);
     }
 };

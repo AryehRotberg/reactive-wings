@@ -1,0 +1,156 @@
+/**
+ * Layout Styles
+ * Container, header, sections, and main layout components
+ */
+
+/* Main Container */
+.container {
+    max-width: var(--breakpoint-desktop);
+    margin: 0 auto;
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Header */
+.header {
+    background: var(--primary-gradient);
+    color: var(--white);
+    padding: var(--spacing-3xl);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/><circle cx="20" cy="20" r="0.5" fill="white" opacity="0.15"/><circle cx="80" cy="30" r="0.8" fill="white" opacity="0.1"/><circle cx="30" cy="80" r="0.6" fill="white" opacity="0.12"/><circle cx="70" cy="70" r="0.4" fill="white" opacity="0.18"/></svg>') repeat;
+    animation: float 20s ease-in-out infinite;
+}
+
+.header h1 {
+    font-size: var(--font-size-3xl);
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 1;
+}
+
+.header p {
+    font-size: 1.1em;
+    opacity: 0.95;
+    position: relative;
+    z-index: 1;
+}
+
+/* Content Area */
+.content {
+    padding: var(--spacing-4xl);
+}
+
+/* Sections */
+.section {
+    background: var(--surface-gradient);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-3xl);
+    margin-bottom: var(--spacing-3xl);
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(42, 82, 152, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-blue) 0%, var(--accent-blue) 50%, var(--light-blue) 100%);
+}
+
+.section h2 {
+    color: var(--primary-blue);
+    margin-bottom: var(--spacing-xl);
+    font-size: var(--font-size-xl);
+    border-bottom: 2px solid var(--light-blue);
+    padding-bottom: 10px;
+    position: relative;
+}
+
+/* Grid Layouts */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-xl);
+}
+
+.form-row-triple {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: var(--spacing-xl);
+}
+
+/* User Info Section */
+.user-info {
+    background: var(--secondary-gradient);
+    color: var(--white);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--spacing-xl);
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.user-info::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: float 15s ease-in-out infinite;
+}
+
+.user-info h3 {
+    margin-bottom: 10px;
+    font-size: var(--font-size-lg);
+    position: relative;
+    z-index: 1;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: var(--spacing-4xl) var(--spacing-xl);
+    color: var(--text-gray);
+    background: var(--surface-gradient);
+    border-radius: var(--radius-lg);
+    border: 2px dashed var(--border-gray);
+}
+
+.empty-state svg {
+    width: 64px;
+    height: 64px;
+    margin-bottom: var(--spacing-lg);
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    margin-bottom: var(--spacing-sm);
+}
+
+.empty-state p {
+    opacity: 0.8;
+}
