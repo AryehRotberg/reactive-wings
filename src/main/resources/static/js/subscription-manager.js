@@ -78,7 +78,7 @@ const SubscriptionManager = {
             UIUtils.validateSubscriptionForm(airlineCode, flightNumber, scheduledDate);
 
             // Search for the flight
-            const searchResults = await API.searchFlights(airlineCode, flightNumber, scheduledDate);
+            const searchResults = await API.searchFlights(airlineCode.toUpperCase(), flightNumber, scheduledDate);
             
             if (!searchResults || searchResults.length === 0) {
                 UIUtils.showMessage("subscriptionMessage", "No flights found with the specified criteria.", true);

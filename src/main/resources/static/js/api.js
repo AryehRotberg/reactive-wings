@@ -84,6 +84,6 @@ const API = {
             throw new Error(`Failed to delete subscription: ${response.status}`);
         }
 
-        return await response.json();
+        return { success: true };
     }
 };
