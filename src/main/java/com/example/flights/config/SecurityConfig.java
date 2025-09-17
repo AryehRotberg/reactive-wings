@@ -70,7 +70,7 @@ public class SecurityConfig
     private ServerLogoutSuccessHandler logoutSuccessHandler()
     {
         OidcClientInitiatedServerLogoutSuccessHandler logoutSuccessHandler = new OidcClientInitiatedServerLogoutSuccessHandler(clientRegistrationRepository);
-        logoutSuccessHandler.setLogoutSuccessUrl(URI.create("https://reactivewings.vercel.app/"));
+        logoutSuccessHandler.setLogoutSuccessUrl(URI.create("/"));
         return logoutSuccessHandler;
     }
 }
