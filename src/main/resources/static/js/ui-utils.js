@@ -78,15 +78,15 @@ const UIUtils = {
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">Terminal</span>
-                        <span class="detail-value">${sub.terminal || 'TBD'}</span>
+                        <span class="detail-value">${sub.terminal || 'NOT CONFIRMED'}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">Counters</span>
-                        <span class="detail-value">${sub.counters || 'TBD'}</span>
+                        <span class="detail-value">${sub.counters || 'NOT CONFIRMED'}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">Check-in Zone</span>
-                        <span class="detail-value">${sub.checkin_zone || 'TBD'}</span>
+                        <span class="detail-value">${sub.checkin_zone || 'NOT CONFIRMED'}</span>
                     </div>
                 </div>
                 <button class="btn btn-danger" id="deleteBtn_${index}" onclick="SubscriptionManager.deleteSubscription('${sub.airline_code}', '${sub.flight_number}', '${this.formatScheduledTimeForAPI(sub.scheduled_time)}', ${index})">

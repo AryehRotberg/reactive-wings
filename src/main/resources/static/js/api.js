@@ -28,7 +28,7 @@ const API = {
      * Search for flights
      */
     async searchFlights(airlineCode, flightNumber, scheduledTime) {
-        const searchUrl = `${this.baseUrl}flights/search?airline_code=${airlineCode}&flight_number=${flightNumber}&scheduled_time=${scheduledTime}`;
+        const searchUrl = `${this.baseUrl}flights/search?airline_code=${airlineCode}&flight_number=${flightNumber}&scheduled_date=${scheduledTime}`;
         
         const response = await fetch(searchUrl, {
             method: "GET",

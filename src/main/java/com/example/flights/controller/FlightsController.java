@@ -43,18 +43,18 @@ public class FlightsController
         @RequestParam(required = false) String scheduled_date,
         @RequestParam(required = false) String estimated_date,
         @RequestParam(required = false) String direction,
-        @RequestParam(required = false) String city_name,
+        @RequestParam(required = false) String city,
         @RequestParam(required = false) String status,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "100") int size
     )
     {
         Query query = new Query();
-        if (airline_code != null) query.addCriteria(Criteria.where("airline_code").is(airline_code));
+        if (airline_code != null) query.addCriteria(Criteria.where("airline_code").is(airline_code.toUpperCase()));
         if (flight_number != null) query.addCriteria(Criteria.where("flight_number").is(flight_number));
-        if (flight_number != null) query.addCriteria(Criteria.where("direction").is(direction));
-        if (flight_number != null) query.addCriteria(Criteria.where("city_name").is(city_name));
-        if (flight_number != null) query.addCriteria(Criteria.where("status").is(status));
+        if (direction != null) query.addCriteria(Criteria.where("direction").is(direction.toUpperCase()));
+        if (city != null) query.addCriteria(Criteria.where("city_name").is(city.toUpperCase()));
+        if (status != null) query.addCriteria(Criteria.where("status_en").is(status.toUpperCase()));
 
         if (scheduled_date != null)
             query.addCriteria(Criteria.where("scheduled_time").regex("^" + java.util.regex.Pattern.quote(scheduled_date)));
