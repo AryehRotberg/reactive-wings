@@ -64,7 +64,15 @@ const FlightApp = {
      * Logout functionality
      */
     logoutUser() {
-        window.location.href = "/logout";
+        fetch("/logout", {
+            method: "POST",
+            credentials: "include" // important if cookies are used
+        })
+        .then(() => {
+            // Clear any tokens you stored in frontend
+            window.location.href = "https://reactivewings.vercel.app"; // your post-logout page
+        })
+        .catch(err => alert("Logout failed: " + err.message));
     }
 };
 
