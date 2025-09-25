@@ -21,8 +21,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
-public class SubscriptionService
-{
+public class SubscriptionService {
     private static final Logger log = LoggerFactory.getLogger(SubscriptionService.class);
 
     @Autowired
@@ -37,10 +36,8 @@ public class SubscriptionService
     private AtomicBoolean checkInProgress = new AtomicBoolean(false);
 
     @Scheduled(fixedDelay = 10000)
-    public void checkSubscriptions()
-    {
-        if (!checkInProgress.compareAndSet(false, true))
-        {
+    public void checkSubscriptions() {
+        if (!checkInProgress.compareAndSet(false, true)) {
             log.debug("Subscription check already running, skipping");
             return;
         }
@@ -58,8 +55,7 @@ public class SubscriptionService
             .subscribe();
     }
 
-    private Mono<Void> processUserSubscriptions(User user)
-    {
+    private Mono<Void> processUserSubscriptions(User user) {
         return Flux.fromIterable(user.getSubscriptions())
             .concatMap(sub -> findMatchingFlight(sub)
                 .map(flight -> applyChanges(flight, sub, user))
@@ -69,8 +65,7 @@ public class SubscriptionService
             .flatMap(changed -> changed ? userRepository.save(user).then() : Mono.empty());
     }
     
-    private Mono<Flight> findMatchingFlight(Flight sub)
-    {
+    private Mono<Flight> findMatchingFlight(Flight sub) {
         Query q = new Query();
         if (sub.getAirlineCode() != null) q.addCriteria(Criteria.where("airlineCode").is(sub.getAirlineCode()));
         if (sub.getFlightNumber() != null) q.addCriteria(Criteria.where("flightNumber").is(sub.getFlightNumber()));
@@ -82,8 +77,7 @@ public class SubscriptionService
         return mongoTemplate.findOne(q, Flight.class);
     }
 
-    private boolean applyChanges(Flight matchingFlight, Flight sub, User user)
-    {
+    private boolean applyChanges(Flight matchingFlight, Flight sub, User user) {
         StringBuilder changeLog = new StringBuilder();
 
         boolean hasChanges = SubscriptionServiceUtils.updateField("Scheduled time", sub::getScheduledTime, matchingFlight::getScheduledTime, sub::setScheduledTime, changeLog) |
@@ -93,11 +87,9 @@ public class SubscriptionService
         SubscriptionServiceUtils.updateField("Check-in zone", sub::getCheckinZone, matchingFlight::getCheckinZone, sub::setCheckinZone, changeLog) |
         SubscriptionServiceUtils.updateField("Status", sub::getStatusEn, matchingFlight::getStatusEn, sub::setStatusEn, changeLog);
 
-        if (hasChanges)
-        {
+        if (hasChanges) {
             sub.setLastUpdated(LocalDateTime.now());
-            if (emailSenderService != null)
-            {
+            if (emailSenderService != null) {
                 emailSenderService.sendFlightUpdateEmailAsync(
                     user.getEmail(), 
                     sub.getAirlineCode(),

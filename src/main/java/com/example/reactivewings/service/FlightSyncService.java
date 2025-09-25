@@ -30,8 +30,7 @@ public class FlightSyncService {
 
     public FlightSyncService(@Autowired FlightRepository flightRepository,
                              @Autowired BenGurionAPI bgnAPI,
-                             @Autowired ObjectMapper objectMapper)
-    {
+                             @Autowired ObjectMapper objectMapper) {
         this.flightRepository = flightRepository;
         this.bgnAPI = bgnAPI;
         this.objectMapper = objectMapper;
@@ -41,10 +40,8 @@ public class FlightSyncService {
     private int batchSize;
     
     @Scheduled(fixedDelay = 60000)
-    public void syncFlightsFromAPI()
-    {
-        if (!syncInProgress.compareAndSet(false, true))
-        {
+    public void syncFlightsFromAPI() {
+        if (!syncInProgress.compareAndSet(false, true)) {
             log.debug("Sync already in progress, skipping");
             return;
         }
@@ -58,8 +55,7 @@ public class FlightSyncService {
             .subscribe();
     }
     
-    private Mono<Long> fetchAndReplaceFlights()
-    {
+    private Mono<Long> fetchAndReplaceFlights() {
         LocalDateTime syncTime = LocalDateTime.now();
         
         return bgnAPI.getBenGurionFlights()
@@ -67,8 +63,7 @@ public class FlightSyncService {
             .retryWhen(Retry.backoff(3, Duration.ofSeconds(2)))
             .map(data -> data.path("result").path("records"))
             .flatMapMany(records -> Flux.fromIterable(records))
-            .map(record ->
-            {
+            .map(record -> {
                 Flight flight = objectMapper.convertValue(record, Flight.class);
                 flight.setLastUpdated(syncTime);
                 return flight;

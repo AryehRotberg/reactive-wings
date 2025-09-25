@@ -20,8 +20,7 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/users")
-public class UserController
-{
+public class UserController {
     private final UserRepository userRepository;
     private final EmailSenderService emailSenderService;
 

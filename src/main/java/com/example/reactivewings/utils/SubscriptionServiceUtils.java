@@ -6,13 +6,15 @@ import java.util.function.Supplier;
 
 public class SubscriptionServiceUtils
 {
-    public static boolean updateField(String fieldName, Supplier<String> oldValSupplier, Supplier<String> newValSupplier, Consumer<String> setter, StringBuilder changeLog)
-    {
+    public static boolean updateField(String fieldName,
+                                    Supplier<String> oldValSupplier,
+                                    Supplier<String> newValSupplier,
+                                    Consumer<String> setter,
+                                    StringBuilder changeLog) {
         String oldVal = oldValSupplier.get();
         String newVal = newValSupplier.get();
 
-        if (!Objects.equals(oldVal, newVal))
-        {
+        if (!Objects.equals(oldVal, newVal)) {
             changeLog.append(fieldName)
                     .append(": ")
                     .append(oldVal)
