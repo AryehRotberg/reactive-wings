@@ -31,14 +31,11 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 public class SecurityConfig
 {
     @Bean
-    public ServerOAuth2AuthorizationRequestResolver authorizationRequestResolver(ReactiveClientRegistrationRepository clientRegistrationRepository)
-    {
+    public ServerOAuth2AuthorizationRequestResolver authorizationRequestResolver(ReactiveClientRegistrationRepository clientRegistrationRepository) {
         DefaultServerOAuth2AuthorizationRequestResolver resolver = new DefaultServerOAuth2AuthorizationRequestResolver(clientRegistrationRepository);
-        return new ServerOAuth2AuthorizationRequestResolver()
-        {
+        return new ServerOAuth2AuthorizationRequestResolver() {
             @Override
-            public reactor.core.publisher.Mono<OAuth2AuthorizationRequest> resolve(org.springframework.web.server.ServerWebExchange exchange, String clientRegistrationId)
-            {
+            public reactor.core.publisher.Mono<OAuth2AuthorizationRequest> resolve(org.springframework.web.server.ServerWebExchange exchange, String clientRegistrationId) {
                 return resolver.resolve(exchange, clientRegistrationId)
                     .map(req -> OAuth2AuthorizationRequest.from(req)
                         .additionalParameters(params -> params.put("prompt", "login"))
@@ -46,8 +43,7 @@ public class SecurityConfig
             }
 
             @Override
-            public reactor.core.publisher.Mono<OAuth2AuthorizationRequest> resolve(org.springframework.web.server.ServerWebExchange exchange)
-            {
+            public reactor.core.publisher.Mono<OAuth2AuthorizationRequest> resolve(org.springframework.web.server.ServerWebExchange exchange) {
                 return resolver.resolve(exchange)
                     .map(req -> OAuth2AuthorizationRequest.from(req)
                         .additionalParameters(params -> params.put("prompt", "login"))
@@ -60,8 +56,7 @@ public class SecurityConfig
     public ReactiveJwtDecoder jwtDecoder(
         @Value("${spring.security.oauth2.resourceserver.jwt.issuer-uri:https://accounts.google.com}") String issuer,
         @Value("${security.jwt.audience:}") String audience
-    )
-    {
+    ) {
         NimbusReactiveJwtDecoder decoder = (NimbusReactiveJwtDecoder) ReactiveJwtDecoders.fromIssuerLocation(issuer);
 
         OAuth2TokenValidator<Jwt> withIssuer = JwtValidators.createDefaultWithIssuer(issuer);
@@ -76,8 +71,7 @@ public class SecurityConfig
     }
 
     @Bean
-    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, ReactiveClientRegistrationRepository clientRegistrationRepository)
-    {
+    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, ReactiveClientRegistrationRepository clientRegistrationRepository) {
         return http
             .csrf(ServerHttpSecurity.CsrfSpec::disable)
             .cors(Customizer.withDefaults())
@@ -94,8 +88,7 @@ public class SecurityConfig
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource()
-    {
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(java.util.List.of(
             "https://reactivewings.vercel.app",
