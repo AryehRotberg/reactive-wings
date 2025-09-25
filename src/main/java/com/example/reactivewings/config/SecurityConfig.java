@@ -1,4 +1,4 @@
-package com.example.flights.config;
+package com.example.reactivewings.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

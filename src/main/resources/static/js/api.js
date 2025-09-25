@@ -28,7 +28,7 @@ const API = {
      * Search for flights
      */
     async searchFlights(airlineCode, flightNumber, scheduledTime) {
-        const searchUrl = `${this.baseUrl}flights/search?airline_code=${airlineCode}&flight_number=${flightNumber}&scheduled_date=${scheduledTime}`;
+        const searchUrl = `${this.baseUrl}flights/search?airlineCode=${airlineCode}&flightNumber=${flightNumber}&scheduledDate=${scheduledTime}`;
         
         const response = await fetch(searchUrl, {
             method: "GET",
@@ -68,9 +68,9 @@ const API = {
      */
     async unsubscribeFromFlight(airlineCode, flightNumber, scheduledTime) {
         const params = new URLSearchParams({
-            airline_code: airlineCode,
-            flight_number: flightNumber,
-            scheduled_date: scheduledTime
+            airlineCode: airlineCode,
+            flightNumber: flightNumber,
+            scheduledDate: scheduledTime
         });
 
         const response = await fetch(this.baseUrl + "users/unsubscribe?" + params.toString(), {

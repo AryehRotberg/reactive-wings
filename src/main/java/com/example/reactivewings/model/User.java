@@ -1,4 +1,4 @@
-package com.example.flights.model;
+package com.example.reactivewings.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,18 +7,16 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document(collection = "users")
-public class UserModel
-{
+public class User {
     @Id
     private String id;
-
+    
     private String email;
+    private List<Flight> subscriptions = new ArrayList<>();
 
-    private List<SubscriptionModel> subscriptions = new ArrayList<>();
+    public User() {}
 
-    public UserModel() {}
-
-    public UserModel(String email) {
+    public User(String email) {
         this.id = email;
         this.email = email;
     }
@@ -29,6 +27,6 @@ public class UserModel
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
-    public List<SubscriptionModel> getSubscriptions() { return subscriptions; }
-    public void setSubscriptions(List<SubscriptionModel> subscriptions) { this.subscriptions = subscriptions; }
+    public List<Flight> getSubscriptions() { return subscriptions; }
+    public void setSubscriptions(List<Flight> subscriptions) { this.subscriptions = subscriptions; }
 }

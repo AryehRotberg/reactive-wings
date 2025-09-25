@@ -1,12 +1,14 @@
-package com.example.flights.service;
+package com.example.reactivewings.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import com.example.flights.model.FlightModel;
-import com.example.flights.repo.FlightRepository;
+
+import com.example.reactivewings.model.Flight;
+import com.example.reactivewings.repo.FlightRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -20,23 +22,23 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class FlightSyncService {
     
     private static final Logger log = LoggerFactory.getLogger(FlightSyncService.class);
-    
+
     private final FlightRepository flightRepository;
     private final BenGurionAPI bgnAPI;
     private final ObjectMapper objectMapper;
     private final AtomicBoolean syncInProgress = new AtomicBoolean(false);
-    
-    @Value("${flight-sync.batch-size:50}")
-    private int batchSize;
-    
-    public FlightSyncService(FlightRepository flightRepository, 
-                            BenGurionAPI bgnAPI, 
-                            ObjectMapper objectMapper)
+
+    public FlightSyncService(@Autowired FlightRepository flightRepository,
+                             @Autowired BenGurionAPI bgnAPI,
+                             @Autowired ObjectMapper objectMapper)
     {
         this.flightRepository = flightRepository;
         this.bgnAPI = bgnAPI;
         this.objectMapper = objectMapper;
     }
+    
+    @Value("${flight-sync.batch-size:50}")
+    private int batchSize;
     
     @Scheduled(fixedDelay = 60000)
     public void syncFlightsFromAPI()
@@ -67,7 +69,7 @@ public class FlightSyncService {
             .flatMapMany(records -> Flux.fromIterable(records))
             .map(record ->
             {
-                FlightModel flight = objectMapper.convertValue(record, FlightModel.class);
+                Flight flight = objectMapper.convertValue(record, Flight.class);
                 flight.setLastUpdated(syncTime);
                 return flight;
             })

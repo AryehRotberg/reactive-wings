@@ -78,7 +78,7 @@ const SubscriptionManager = {
             UIUtils.validateSubscriptionForm(airlineCode, flightNumber, scheduledDate);
 
             // Search for the flight
-            const searchResults = await API.searchFlights(airlineCode.toUpperCase(), flightNumber, scheduledDate);
+            const searchResults = await API.searchFlights(airlineCode, flightNumber, scheduledDate);
             
             if (!searchResults || searchResults.length === 0) {
                 UIUtils.showMessage("subscriptionMessage", "No flights found with the specified criteria.", true);
@@ -87,21 +87,23 @@ const SubscriptionManager = {
 
             // Prepare subscription data
             const flightData = {
-                airline_code: searchResults[0].airline_code,
-                flight_number: searchResults[0].flight_number,
-                scheduled_time: searchResults[0].scheduled_time,
-                estimated_time: searchResults[0].estimated_time,
-                last_status: searchResults[0].status_en,
-                last_updated: new Date().toISOString(),
-                airline_name: searchResults[0].airline_name,
-                airport_code: searchResults[0].airport_code,
-                city_en: searchResults[0].city_en,
-                city_he: searchResults[0].city_he,
-                country_en: searchResults[0].country_en,
-                country_he: searchResults[0].country_he,
+                id: searchResults[0].id,
+                flightId: searchResults[0].flightId,
+                airlineCode: searchResults[0].airlineCode,
+                flightNumber: searchResults[0].flightNumber,
+                scheduledTime: searchResults[0].scheduledTime,
+                estimatedTime: searchResults[0].estimatedTime,
+                statusEn: searchResults[0].statusEn,
+                airlineName: searchResults[0].airlineName,
+                airportCode: searchResults[0].airportCode,
+                cityEn: searchResults[0].cityEn,
+                cityHe: searchResults[0].cityHe,
+                countryEn: searchResults[0].countryEn,
+                countryHe: searchResults[0].countryHe,
                 terminal: searchResults[0].terminal,
                 counters: searchResults[0].counters,
-                checkin_zone: searchResults[0].checkin_zone
+                checkinZone: searchResults[0].checkinZone,
+                lastUpdated: new Date().toISOString()
             };
 
             // Subscribe to the flight
@@ -126,9 +128,9 @@ const SubscriptionManager = {
         document.getElementById("subscriptionForm").addEventListener("submit", async (e) => {
             e.preventDefault();
             
-            const airlineCode = document.getElementById("airline_code").value;
-            const flightNumber = document.getElementById("flight_number").value;
-            const scheduledDate = document.getElementById("scheduled_date").value;
+            const airlineCode = document.getElementById("airlineCode").value;
+            const flightNumber = document.getElementById("flightNumber").value;
+            const scheduledDate = document.getElementById("scheduledDate").value;
 
             await this.subscribeToFlight(airlineCode, flightNumber, scheduledDate);
         });

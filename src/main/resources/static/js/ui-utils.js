@@ -59,23 +59,23 @@ const UIUtils = {
                 <div class="subscription-details">
                     <div class="detail-item">
                         <span class="detail-label">Flight</span>
-                        <span class="detail-value"><span class="flight-icon">✈️</span>${sub.airline_code} ${sub.flight_number}</span>
+                        <span class="detail-value"><span class="flight-icon">✈️</span>${sub.airlineCode} ${sub.flightNumber}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">Airline Company</span>
-                        <span class="detail-value">${sub.airline_name}</span>
+                        <span class="detail-value">${sub.airlineName}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">Estimated Time</span>
-                        <span class="detail-value">${this.formatDate(sub.estimated_time)}</span>
+                        <span class="detail-value">${this.formatDate(sub.estimatedTime)}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">Destination</span>
-                        <span class="detail-value">${sub.city_en || 'N/A'} (${sub.country_en || 'N/A'})</span>
+                        <span class="detail-value">${sub.cityEn || 'N/A'} (${sub.countryEn || 'N/A'})</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">Status</span>
-                        <span class="detail-value">${sub.last_status || 'Unknown'}</span>
+                        <span class="detail-value">${sub.statusEn || 'Unknown'}</span>
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">Terminal</span>
@@ -87,10 +87,10 @@ const UIUtils = {
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">Check-in Zone</span>
-                        <span class="detail-value">${sub.checkin_zone || 'NOT CONFIRMED'}</span>
+                        <span class="detail-value">${sub.checkinZone || 'NOT CONFIRMED'}</span>
                     </div>
                 </div>
-                <button class="btn btn-danger" id="deleteBtn_${index}" onclick="SubscriptionManager.deleteSubscription('${sub.airline_code}', '${sub.flight_number}', '${this.formatScheduledTimeForAPI(sub.scheduled_time)}', ${index})">
+                <button class="btn btn-danger" id="deleteBtn_${index}" onclick="SubscriptionManager.deleteSubscription('${sub.airlineCode}', '${sub.flightNumber}', '${this.formatScheduledTimeForAPI(sub.scheduledTime)}', ${index})">
                     <span class="btn-icon">🗑️</span>
                     <span class="btn-text">Remove Subscription</span>
                 </button>

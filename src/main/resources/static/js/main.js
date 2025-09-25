@@ -54,7 +54,7 @@ const FlightApp = {
             String(today.getMonth() + 1).padStart(2, '0') + '-' + 
             String(today.getDate()).padStart(2, '0');
         
-        const scheduledDateField = document.getElementById('scheduled_date');
+        const scheduledDateField = document.getElementById('scheduledDate');
         if (scheduledDateField) {
             scheduledDateField.value = formattedDate;
         }

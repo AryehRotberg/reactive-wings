@@ -1,4 +1,4 @@
-package com.example.flights.template;
+package com.example.reactivewings.utils;
 
 public class EmailTemplates
 {

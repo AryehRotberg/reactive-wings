@@ -1,4 +1,4 @@
-package com.example.flights.service;
+package com.example.reactivewings.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,8 +7,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 @Service
-public class BenGurionAPI
-{
+public class BenGurionAPI {
     private final WebClient webClient;
     private final ObjectMapper objectMapper;
 
@@ -17,21 +16,15 @@ public class BenGurionAPI
         this.objectMapper = objectMapper;
     }
 
-    public Mono<JsonNode> getBenGurionFlights()
-    {
+    public Mono<JsonNode> getBenGurionFlights() {
         return webClient.get()
                 .uri("/api/3/action/datastore_search?resource_id=e83f763b-b7d7-479e-b172-ae981ddc6de5")
                 .retrieve()
                 .bodyToMono(String.class)
-                .map(body ->
-                {
-                    try
-                    {
+                .map(body -> {
+                    try {
                         return objectMapper.readTree(body);
-                    }
-                    
-                    catch (Exception e)
-                    {
+                    } catch (Exception e) {
                         throw new RuntimeException("Failed to parse response", e);
                     }
                 });
