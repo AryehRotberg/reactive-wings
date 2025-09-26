@@ -41,6 +41,7 @@ public class FlightsController {
         @RequestParam(defaultValue = "100") int size
     ) {
         Query query = FlightsControllerUtils.buildSearchQuery(page, size);
+        
         if (airlineCode != null) query.addCriteria(Criteria.where("airlineCode").is(airlineCode.toUpperCase()));
         if (flightNumber != null) query.addCriteria(Criteria.where("flightNumber").is(flightNumber));
         if (direction != null) query.addCriteria(Criteria.where("direction").is(direction.toUpperCase()));

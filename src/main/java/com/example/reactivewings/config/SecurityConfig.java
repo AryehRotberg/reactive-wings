@@ -21,6 +21,7 @@ import org.springframework.security.oauth2.jwt.NimbusReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
 import org.springframework.security.oauth2.jwt.ReactiveJwtDecoders;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.authentication.RedirectServerAuthenticationSuccessHandler;
 import org.springframework.security.web.server.authentication.logout.HttpStatusReturningServerLogoutSuccessHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.reactive.CorsConfigurationSource;
@@ -71,18 +72,21 @@ public class SecurityConfig
     }
 
     @Bean
-    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http, ReactiveClientRegistrationRepository clientRegistrationRepository) {
+    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http,
+                                                        ReactiveClientRegistrationRepository clientRegistrationRepository) {
         return http
             .csrf(ServerHttpSecurity.CsrfSpec::disable)
             .cors(Customizer.withDefaults())
             .authorizeExchange(exchanges -> exchanges
-                .pathMatchers("/health", "/actuator/**").permitAll()
+                .pathMatchers("/health", "/actuator/**", "/flights/**").permitAll()
                 .anyExchange().authenticated()
             )
-            .oauth2Login(oauth2 -> oauth2.authorizationRequestResolver(authorizationRequestResolver(clientRegistrationRepository)))
+            .oauth2Login(oauth2 -> oauth2
+                .authorizationRequestResolver(authorizationRequestResolver(clientRegistrationRepository))
+                .authenticationSuccessHandler(new RedirectServerAuthenticationSuccessHandler("http://localhost:3000/dashboard"))
+            )
             .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()))
             .logout(logout -> logout
-            .logoutUrl("/logout")
             .logoutSuccessHandler(new HttpStatusReturningServerLogoutSuccessHandler(HttpStatus.NO_CONTENT)))
             .build();
     }
@@ -94,8 +98,7 @@ public class SecurityConfig
             "https://reactivewings.vercel.app",
             "http://35.224.131.227.nip.io:8080",
             "http://localhost:8080",
-            "http://localhost:3000",
-            "http://localhost:5173"
+            "http://localhost:3000"
         ));
         config.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(java.util.List.of("*"));
