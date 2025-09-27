@@ -26,8 +26,8 @@ public class JwtAuthSuccessHandler implements ServerAuthenticationSuccessHandler
         OAuth2AuthenticatedPrincipal principal = (OAuth2AuthenticatedPrincipal) authentication.getPrincipal();
 
         String email = principal.getAttribute("email");
-        String name  = principal.getAttribute("name");
-        String sub   = principal.getAttribute("sub");
+        String name = principal.getAttribute("name");
+        String sub = principal.getAttribute("sub");
 
         Map<String, Object> claims = new HashMap<>();
         if (email != null) claims.put("email", email);
@@ -38,7 +38,7 @@ public class JwtAuthSuccessHandler implements ServerAuthenticationSuccessHandler
 
         String jwt = jwtUtil.generateToken(claims, subject);
 
-        String redirectUrl = "http://localhost:3000/dashboard?token=" + jwt;
+        String redirectUrl = "https://reactivewings.vercel.app/dashboard?token=" + jwt;
         var response = webFilterExchange.getExchange().getResponse();
         response.setStatusCode(HttpStatus.FOUND);
         response.getHeaders().set("Location", redirectUrl);
