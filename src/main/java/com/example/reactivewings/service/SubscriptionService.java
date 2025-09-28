@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -24,14 +23,17 @@ import reactor.core.publisher.Mono;
 public class SubscriptionService {
     private static final Logger log = LoggerFactory.getLogger(SubscriptionService.class);
 
-    @Autowired
-    private UserRepository userRepository;
+    private static UserRepository userRepository;
+    private static EmailSenderService emailSenderService;
+    private static ReactiveMongoTemplate mongoTemplate;
 
-    @Autowired
-    private EmailSenderService emailSenderService;
-
-    @Autowired
-    private ReactiveMongoTemplate mongoTemplate;
+    public SubscriptionService(UserRepository userRepository, 
+                                EmailSenderService emailSenderService,
+                                ReactiveMongoTemplate mongoTemplate) {
+        SubscriptionService.userRepository = userRepository;
+        SubscriptionService.emailSenderService = emailSenderService;
+        SubscriptionService.mongoTemplate = mongoTemplate;
+    }
 
     private AtomicBoolean checkInProgress = new AtomicBoolean(false);
 
