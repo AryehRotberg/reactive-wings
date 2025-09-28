@@ -49,8 +49,7 @@ public class SubscriptionService {
         userRepository.findAll()
             .flatMap(this::processUserSubscriptions)
             .doOnError(error -> log.error("Error in subscription check: {}", error.getMessage()))
-            .doFinally(signal ->
-            {
+            .doFinally(signal -> {
                 checkInProgress.set(false);
                 log.info("Subscription check completed");
             })

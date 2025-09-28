@@ -63,7 +63,10 @@ public class EmailTemplates
             """.formatted(subject, bodyContent);
     }
 
-    public static String subscriptionConfirmationHtml(String airlineCode, String flightNumber, String city_en) {
+    public static String subscriptionConfirmationHtml(String airlineCode,
+                                                    String flightNumber,
+                                                    String direction,
+                                                    String city_en) {
         return """
             <html>
             <head>
@@ -77,7 +80,7 @@ public class EmailTemplates
                 <div class="container">
                 <h2>Subscription Confirmed ✅</h2>
                 <p>Hello,</p>
-                <p>You have successfully subscribed to flight <b>%s %s to %s.</b></p>
+                <p>You have successfully subscribed to flight <b>%s %s %s %s.</b></p>
                 <p>We'll notify you when there are updates.</p>
                 <p>Best regards,<br/>Flight Notification System</p>
                 <div class="footer">
@@ -86,6 +89,6 @@ public class EmailTemplates
                 </div>
             </body>
             </html>
-            """.formatted(airlineCode, flightNumber, city_en);
+            """.formatted(airlineCode, flightNumber, direction, city_en);
     }
 }

@@ -24,7 +24,10 @@ public class EmailSenderService {
         this.sendGrid = new SendGrid(System.getenv("SENDGRID_API_KEY"));
     }
 
-    private void sendEmail(String toEmail, String subject, String body, boolean html) throws IOException {
+    private void sendEmail(String toEmail,
+                            String subject,
+                            String body,
+                            boolean html) throws IOException {
         Email from = new Email("flightsapispringboot@gmail.com");
         Email to = new Email(toEmail);
         Content content = new Content("text/html", body);
@@ -47,7 +50,10 @@ public class EmailSenderService {
         }
     }
 
-    public Mono<Void> sendFlightUpdateEmailAsync(String toEmail, String airlineCode, String flightNumber, String changes) {
+    public Mono<Void> sendFlightUpdateEmailAsync(String toEmail,
+                                                String airlineCode,
+                                                String flightNumber,
+                                                String changes) {
         return Mono.fromRunnable(() -> {
             try {
                 String subject = "Flight Update Alert - " + airlineCode + " " + flightNumber;
@@ -61,11 +67,23 @@ public class EmailSenderService {
         .then();
     }
 
-    public Mono<Void> sendConfirmationEmailAsync(String toEmail, String airlineCode, String flightNumber, String cityEn) {
+    public Mono<Void> sendConfirmationEmailAsync(String toEmail,
+                                                String airlineCode,
+                                                String flightNumber,
+                                                String cityEn,
+                                                String direction) {
         return Mono.fromRunnable(() -> {
             try {
-                String subject = "Subscription Confirmed - " + airlineCode + " " + flightNumber + " to " + cityEn + " ✈️";
-                String htmlContent = EmailTemplates.subscriptionConfirmationHtml(airlineCode, flightNumber, cityEn);
+                String directionStr = direction.equals("D") ? "to" : "from";
+                String subject = new StringBuilder()
+                    .append("Subscription Confirmed - ")
+                    .append(airlineCode).append(" ")
+                    .append(flightNumber).append(" ")
+                    .append(directionStr).append(" ")
+                    .append(cityEn)
+                    .append(" ✈️")
+                    .toString();
+                String htmlContent = EmailTemplates.subscriptionConfirmationHtml(airlineCode, flightNumber, directionStr, cityEn);
                 sendEmail(toEmail, subject, htmlContent, true);
             } catch (IOException e) {
                 e.printStackTrace();
