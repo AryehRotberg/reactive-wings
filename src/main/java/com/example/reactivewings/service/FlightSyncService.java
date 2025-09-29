@@ -2,7 +2,6 @@ package com.example.reactivewings.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -28,9 +27,9 @@ public class FlightSyncService {
     private final ObjectMapper objectMapper;
     private final AtomicBoolean syncInProgress = new AtomicBoolean(false);
 
-    public FlightSyncService(@Autowired FlightRepository flightRepository,
-                             @Autowired BenGurionAPI bgnAPI,
-                             @Autowired ObjectMapper objectMapper) {
+    public FlightSyncService(FlightRepository flightRepository,
+                             BenGurionAPI bgnAPI,
+                             ObjectMapper objectMapper) {
         this.flightRepository = flightRepository;
         this.bgnAPI = bgnAPI;
         this.objectMapper = objectMapper;

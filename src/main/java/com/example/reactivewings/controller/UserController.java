@@ -2,7 +2,6 @@ package com.example.reactivewings.controller;
 
 import java.security.Principal;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,8 +23,8 @@ public class UserController {
     private final UserRepository userRepository;
     private final EmailSenderService emailSenderService;
 
-    public UserController(@Autowired UserRepository userRepository,
-                          @Autowired EmailSenderService emailSenderService) {
+    public UserController(UserRepository userRepository,
+                          EmailSenderService emailSenderService) {
         this.userRepository = userRepository;
         this.emailSenderService = emailSenderService;
     }
