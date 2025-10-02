@@ -8,6 +8,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    
+    env:
+      VERSION: "1.1.1"
 
     steps:
       - name: Checkout code
@@ -26,18 +29,9 @@ jobs:
         run: ./mvnw clean package -DskipTests
 
       - name: Build Docker image
-        run: |
-          version="1.1.0"
-          docker build -t aryehrotberg709/reactivewings:$version .
-
-      # - name: Log in to Docker Hub
-      #   uses: docker/login-action@v1
-      #   with:
-      #     username: ${{ secrets.DOCKER_USERNAME }}
-      #     password: ${{ secrets.DOCKER_PASSWORD }}
+        run: docker build -t aryehrotberg709/reactivewings:${{ env.VERSION }} .
 
       - name: Push Docker image
         run: |
-          version="1.1.0"
           docker login -u aryehrotberg709 -p ${{ secrets.DOCKER_HUB_TOKEN }}
-          docker push aryehrotberg709/reactivewings:$version
+          docker push aryehrotberg709/reactivewings:${{ env.VERSION }}

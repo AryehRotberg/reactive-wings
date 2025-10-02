@@ -1,6 +1,8 @@
 # ✈️ Reactive Wings – Flight Subscription Manager
 
-Reactive, real-time flight monitoring and email notifications with Spring Boot WebFlux. The app ingests Ben Gurion Airport flight data, lets users subscribe to flights, and sends HTML email alerts on changes.
+Reactive, real-time flight monitNotes:
+- There's no SMTP fallback; email is sent via SendGrid SDK.
+- CORS is configured to allow the React frontend and local development origins: `https://reactivewings.vercel.app`, `http://35.224.131.227.nip.io:8080`, `http://localhost:8080`, `http://localhost:3000`, `http://localhost:5173` (see `SecurityConfig`).ng and email notifications with Spring Boot WebFlux. The app ingests Ben Gurion Airport flight data, lets users subscribe to flights, and sends HTML email alerts on changes.
 
 ## 🚀 Highlights
 
@@ -8,8 +10,13 @@ Reactive, real-time flight monitoring and email notifications with Spring Boot W
 - Subscriptions checked every 10s with change detection (schedule, terminal, counters, check-in zone, status)
 - Google OAuth 2.0 login (resource server + login) – most endpoints require auth
 - SendGrid-based HTML emails (confirmation + updates)
-- Static SPA served from Spring Boot under `/`
+- RESTful API backend for separate React frontend
 - Docker-ready; Java 21; Spring Boot 3.5.5 WebFlux
+
+## 🌐 Live Application
+
+Frontend (React): [https://reactivewings.vercel.app](https://reactivewings.vercel.app)  
+Backend API: Deployed separately (configured via CORS)
 
 ## 🛠️ Tech Stack
 
@@ -35,13 +42,14 @@ src/main/java/com/example/flights/
 └─ template/EmailTemplates.java      # Email HTML templates
 
 src/main/resources/
-├─ application.properties            # Uses env var placeholders
-└─ static/                           # SPA (index.html, js, css)
+└─ application.properties            # Uses env var placeholders
 ```
+
+> **Note:** The frontend is a separate React application hosted at [https://reactivewings.vercel.app](https://reactivewings.vercel.app)
 
 ## 🔌 API
 
-Authentication: All routes require Google OAuth login, except static assets. After logging in via the SPA, you can use the API and Swagger UI.
+Authentication: All routes require Google OAuth login. The frontend React application at [https://reactivewings.vercel.app](https://reactivewings.vercel.app) handles user authentication and communicates with this backend API.
 
 - GET `/flights`
   - Query: `page` (default 0), `size` (default 100, max 500)
@@ -106,7 +114,8 @@ export SENDGRID_API_KEY="..."
 mvnw.cmd spring-boot:run
 ```
 
-App UI: http://localhost:8080
+API will be available at: http://localhost:8080  
+Frontend: Use the React app at [https://reactivewings.vercel.app](https://reactivewings.vercel.app) or run it locally
 
 ## 🐳 Docker
 
@@ -165,7 +174,7 @@ Ensure the sender is verified in SendGrid. Update the hard-coded "from" address 
 ./mvnw clean package -DskipTests
 ```
 
-Swagger UI is behind OAuth login; access the SPA at `/` and authenticate to explore the API.
+Swagger UI is behind OAuth login; authenticate via the frontend application to explore the API at `/swagger-ui.html`.
 
 ## 🧰 Scripts
 
