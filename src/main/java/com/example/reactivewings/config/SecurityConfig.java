@@ -93,7 +93,7 @@ public class SecurityConfig
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(java.util.List.of(
             "https://reactivewings.vercel.app",
-            "http://136.112.133.231.nip.io:8080",
+            "http://34.56.197.29.nip.io:8080",
             "http://localhost:8080",
             "http://localhost:5173",
             "http://localhost:5500"
