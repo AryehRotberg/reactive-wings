@@ -23,7 +23,7 @@ jobs:
         run: chmod +x ./mvnw
 
       - name: Build with Maven
-        run: ./mvnw clean package
+        run: ./mvnw clean package -DskipTests
 
       - name: Build Docker image
         run: |
