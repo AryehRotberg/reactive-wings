@@ -32,8 +32,4 @@ public class JwtUtil {
                 .signWith(getKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
-
-    public String generateToken(String subject) {
-        return generateToken(Map.of(), subject);
-    }
 }
