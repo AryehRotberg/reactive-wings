@@ -9,11 +9,7 @@ import org.springframework.stereotype.Service;
 import com.example.reactivewings.model.Flight;
 import com.example.reactivewings.repo.FlightRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.retry.Retry;
-
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -57,11 +53,7 @@ public class FlightSyncService {
     private Mono<Long> fetchAndReplaceFlights() {
         LocalDateTime syncTime = LocalDateTime.now();
         
-        return bgnAPI.getBenGurionFlights()
-            .timeout(Duration.ofSeconds(30))
-            .retryWhen(Retry.backoff(3, Duration.ofSeconds(2)))
-            .map(data -> data.path("result").path("records"))
-            .flatMapMany(records -> Flux.fromIterable(records))
+        return bgnAPI.getBenGurionFlightRecords()
             .map(record -> {
                 Flight flight = objectMapper.convertValue(record, Flight.class);
                 flight.setLastUpdated(syncTime);
