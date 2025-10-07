@@ -14,7 +14,6 @@ import reactor.core.publisher.Mono;
 
 @Component
 public class JwtAuthSuccessHandler implements ServerAuthenticationSuccessHandler {
-    
     private final JwtUtil jwtUtil;
     
     public JwtAuthSuccessHandler(JwtUtil jwtUtil) {

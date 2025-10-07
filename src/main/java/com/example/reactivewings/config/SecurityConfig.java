@@ -26,8 +26,7 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 @Configuration
 @EnableWebFluxSecurity
-public class SecurityConfig
-{
+public class SecurityConfig {
     private final JwtAuthSuccessHandler jwtAuthSuccessHandler;
     
     @Value("${jwt.secret}")
