@@ -74,7 +74,7 @@ public class EmailSenderService {
                                                 String direction) {
         return Mono.fromRunnable(() -> {
             try {
-                String directionStr = direction.equals("D") ? "ל" : "מ-";
+                String directionStr = direction.equals("D") ? "ל" : "מ";
                 String subject = new StringBuilder()
                     .append("אישור הרשמה לטיסת ")
                     .append(airlineCode).append(" ")
