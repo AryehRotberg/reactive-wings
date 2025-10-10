@@ -85,7 +85,7 @@ public class EmailTemplates
                 <div class="container" dir="rtl">
                 <h2>המנוי אושר ✅</h2>
                 <p>שלום,</p>
-                <p>נרשמת בהצלחה לקבלת עדכונים על טיסה <b>%s %s %s %s.</b></p>
+                <p>נרשמת בהצלחה לקבלת עדכונים על טיסה <b>%s %s %s%s.</b></p>
                 <p>נודיע לך כאשר יהיו עדכונים.</p>
                 <p>בברכה,<br/>reactivewings - מערכת התראות טיסות</p>
                 <div class="footer">

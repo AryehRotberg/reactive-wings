@@ -79,7 +79,7 @@ public class EmailSenderService {
                     .append("אישור הרשמה לטיסת ")
                     .append(airlineCode).append(" ")
                     .append(flightNumber).append(" ")
-                    .append(directionStr).append(" ")
+                    .append(directionStr)
                     .append(cityHe)
                     .append(" ✈️")
                     .toString();
