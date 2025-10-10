@@ -53,7 +53,7 @@ public class UserController {
                     email,
                     subscription.getAirlineCode(),
                     subscription.getFlightNumber(),
-                    subscription.getCityEn(),
+                    subscription.getCityHe(),
                     subscription.getDirection()
                 )
                 .thenReturn(savedUser)

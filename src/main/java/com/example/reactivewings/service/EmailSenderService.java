@@ -70,20 +70,20 @@ public class EmailSenderService {
     public Mono<Void> sendConfirmationEmailAsync(String toEmail,
                                                 String airlineCode,
                                                 String flightNumber,
-                                                String cityEn,
+                                                String cityHe,
                                                 String direction) {
         return Mono.fromRunnable(() -> {
             try {
-                String directionStr = direction.equals("D") ? "ל" : "מ";
+                String directionStr = direction.equals("D") ? "ל" : "מ-";
                 String subject = new StringBuilder()
                     .append("אישור הרשמה לטיסת ")
                     .append(airlineCode).append(" ")
                     .append(flightNumber).append(" ")
                     .append(directionStr).append(" ")
-                    .append(cityEn)
+                    .append(cityHe)
                     .append(" ✈️")
                     .toString();
-                String htmlContent = EmailTemplates.subscriptionConfirmationHtml(airlineCode, flightNumber, directionStr, cityEn);
+                String htmlContent = EmailTemplates.subscriptionConfirmationHtml(airlineCode, flightNumber, directionStr, cityHe);
                 sendEmail(toEmail, subject, htmlContent, true);
             } catch (IOException e) {
                 e.printStackTrace();

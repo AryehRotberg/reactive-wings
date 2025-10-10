@@ -68,7 +68,7 @@ public class EmailTemplates
     public static String subscriptionConfirmationHtml(String airlineCode,
                                                     String flightNumber,
                                                     String direction,
-                                                    String city_en) {
+                                                    String cityHe) {
         return """
             <html dir="rtl">
             <head>
@@ -94,6 +94,6 @@ public class EmailTemplates
                 </div>
             </body>
             </html>
-            """.formatted(airlineCode, flightNumber, direction, city_en);
+            """.formatted(airlineCode, flightNumber, direction, cityHe);
     }
 }
