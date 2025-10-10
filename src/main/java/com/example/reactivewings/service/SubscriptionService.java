@@ -81,12 +81,12 @@ public class SubscriptionService {
     private boolean applyChanges(Flight matchingFlight, Flight sub, User user) {
         StringBuilder changeLog = new StringBuilder();
 
-        boolean hasChanges = SubscriptionServiceUtils.updateField("Scheduled time", sub::getScheduledTime, matchingFlight::getScheduledTime, sub::setScheduledTime, changeLog) |
-        SubscriptionServiceUtils.updateField("Estimated time", sub::getEstimatedTime, matchingFlight::getEstimatedTime, sub::setEstimatedTime, changeLog) |
-        SubscriptionServiceUtils.updateField("Terminal", () -> String.valueOf(sub.getTerminal()), () -> String.valueOf(matchingFlight.getTerminal()), t -> sub.setTerminal(matchingFlight.getTerminal()), changeLog) |
-        SubscriptionServiceUtils.updateField("Counters", sub::getCounters, matchingFlight::getCounters, sub::setCounters, changeLog) |
-        SubscriptionServiceUtils.updateField("Check-in zone", sub::getCheckinZone, matchingFlight::getCheckinZone, sub::setCheckinZone, changeLog) |
-        SubscriptionServiceUtils.updateField("Status", sub::getStatusEn, matchingFlight::getStatusEn, sub::setStatusEn, changeLog);
+        boolean hasChanges = SubscriptionServiceUtils.updateField("זמן מתוכנן", sub::getScheduledTime, matchingFlight::getScheduledTime, sub::setScheduledTime, changeLog) |
+        SubscriptionServiceUtils.updateField("זמן משוער", sub::getEstimatedTime, matchingFlight::getEstimatedTime, sub::setEstimatedTime, changeLog) |
+        SubscriptionServiceUtils.updateField("טרמינל", () -> String.valueOf(sub.getTerminal()), () -> String.valueOf(matchingFlight.getTerminal()), t -> sub.setTerminal(matchingFlight.getTerminal()), changeLog) |
+        SubscriptionServiceUtils.updateField("דלפקים", sub::getCounters, matchingFlight::getCounters, sub::setCounters, changeLog) |
+        SubscriptionServiceUtils.updateField("אזור צ'ק-אין", sub::getCheckinZone, matchingFlight::getCheckinZone, sub::setCheckinZone, changeLog) |
+        SubscriptionServiceUtils.updateField("סטטוס", sub::getStatusHe, matchingFlight::getStatusHe, sub::setStatusHe, changeLog);
 
         if (hasChanges) {
             sub.setLastUpdated(LocalDateTime.now());

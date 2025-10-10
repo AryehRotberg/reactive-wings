@@ -56,7 +56,7 @@ public class EmailSenderService {
                                                 String changes) {
         return Mono.fromRunnable(() -> {
             try {
-                String subject = "Flight Update Alert - " + airlineCode + " " + flightNumber;
+                String subject = "עדכון טיסה " + airlineCode + " " + flightNumber + " - reactivewings";
                 String flightHtmlContent = EmailTemplates.flightUpdateHtml(airlineCode, flightNumber, changes);
                 sendEmail(toEmail, subject, EmailTemplates.genericHtml(subject, flightHtmlContent), true);
             } catch (IOException e) {
